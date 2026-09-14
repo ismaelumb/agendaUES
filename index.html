@@ -203,6 +203,28 @@
         }
 
         /* ----------------------------------
+           LEYENDA DE USUARIOS (COLOR CHIPS)
+        ----------------------------------- */
+        .leyenda-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .leyenda-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: #ffffff;
+            box-shadow: var(--shadow-sm);
+        }
+
+        /* ----------------------------------
            FORMULARIOS & INPUTS
         ----------------------------------- */
         .form-group {
@@ -322,13 +344,12 @@
 
         #lista-citas li {
             border: 1px solid var(--border);
-            border-left: 4px solid var(--primary);
             border-radius: 8px;
             padding: 14px 16px;
             background-color: var(--surface);
             display: flex;
             flex-direction: column;
-            gap: 4px;
+            gap: 6px;
             transition: transform 0.15s ease, box-shadow 0.15s ease;
         }
 
@@ -337,21 +358,37 @@
             box-shadow: var(--shadow-md);
         }
 
+        .cita-header-user {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tag-usuario {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.725rem;
+            font-weight: 700;
+            color: #ffffff;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+
         #lista-citas li strong {
             font-size: 0.95rem;
             color: var(--text-title);
         }
 
-        #lista-citas li span {
+        #lista-citas li span.fecha-texto {
             font-size: 0.825rem;
-            color: var(--primary);
-            font-weight: 600;
+            color: var(--text-muted);
+            font-weight: 500;
         }
 
         #lista-citas li small {
             font-size: 0.85rem;
-            color: var(--text-muted);
-            margin-top: 4px;
+            color: var(--text-secondary);
         }
 
         /* ----------------------------------
@@ -408,12 +445,11 @@
         }
         .fc-event {
             border-radius: 6px !important;
-            background-color: var(--primary-light) !important;
-            border: 1px solid #c7d2fe !important;
-            color: var(--primary) !important;
-            padding: 2px 6px !important;
+            padding: 3px 6px !important;
             font-weight: 600 !important;
+            font-size: 0.8rem !important;
             cursor: pointer;
+            border: none !important;
         }
     </style>
 </head>
@@ -474,6 +510,12 @@
         <!-- COLUMNA PRINCIPAL (CALENDARIO Y LISTA) -->
         <main class="main-area">
             
+            <!-- LEYENDA DE COLORES DE USUARIOS (SOLO ADMIN) -->
+            <div id="card-leyenda-admin" class="card oculto" style="padding: 16px 24px;">
+                <div class="card-title" style="font-size: 0.875rem; margin-bottom: 8px;">🎨 Leyenda de Usuarios Registrados:</div>
+                <div id="leyenda-usuarios" class="leyenda-container"></div>
+            </div>
+
             <!-- CALENDARIO -->
             <div class="card">
                 <div class="card-header">
@@ -555,6 +597,33 @@
     let miNombreUsuario = "";
     let calendar;
 
+    // Paleta de colores atractivos para diferenciar cada usuario
+    const PALETA_COLORES = [
+        "#2563eb", // Azul
+        "#059669", // Verde esmeralda
+        "#d97706", // Ámbar / Naranja
+        "#7c3aed", // Púrpura
+        "#db2777", // Rosa
+        "#0891b2", // Cían
+        "#ea580c", // Naranja brillante
+        "#4f46e5", // Índigo
+        "#ca8a04", // Amarillo oliva
+        "#be123c"  # Rojo carmesí
+    ];
+    
+    const mapaColoresUsuario = {};
+
+    // Asigna un color único y consistente a cada nombre de usuario
+    function obtenerColorUsuario(nombreUsuario) {
+        if (!nombreUsuario) return "#4f46e5";
+        const key = nombreUsuario.toLowerCase().trim();
+        if (!mapaColoresUsuario[key]) {
+            const totalRegistrados = Object.keys(mapaColoresUsuario).length;
+            mapaColoresUsuario[key] = PALETA_COLORES[totalRegistrados % PALETA_COLORES.length];
+        }
+        return mapaColoresUsuario[key];
+    }
+
     // 1. Inicializar el Calendario Interactivo
     function inicializarCalendario() {
         const calendarEl = document.getElementById('calendar');
@@ -571,7 +640,9 @@
                 alert("📅 Fecha seleccionada: " + info.dateStr + "\nCompleta los datos en el formulario lateral.");
             },
             eventClick: function(info) {
-                alert("📌 Cita: " + info.event.title + "\n📝 Detalles: " + (info.event.extendedProps.detalles || "Sin detalles"));
+                const u = info.event.extendedProps.usuario;
+                const msjUser = u ? ("👤 Usuario: " + u + "\n") : "";
+                alert("📌 Cita: " + info.event.title + "\n" + msjUser + "📝 Detalles: " + (info.event.extendedProps.detalles || "Sin detalles"));
             }
         });
         calendar.render();
@@ -622,11 +693,13 @@
             document.getElementById("pantalla-panel").classList.remove("oculto");
             document.getElementById("mensaje-bienvenida").innerText = `${miNombreUsuario} (${miRol.toUpperCase()})`;
             
-            // Mostrar u ocultar Panel Admin
+            // Mostrar u ocultar controles de Administrador
             if (miRol === 'admin') {
                 document.getElementById("seccion-admin").classList.remove("oculto");
+                document.getElementById("card-leyenda-admin").classList.remove("oculto");
             } else {
                 document.getElementById("seccion-admin").classList.add("oculto");
+                document.getElementById("card-leyenda-admin").classList.add("oculto");
             }
 
             // Inicializar y renderizar calendario
@@ -670,6 +743,7 @@
         const datos = {
             accion: "crear_cita",
             idUsuario: miIdUsuario,
+            usuario: miNombreUsuario,
             titulo: titulo,
             fechaHora: fecha,
             detalles: detalles
@@ -687,7 +761,7 @@
         }
     }
 
-    // 6. Cargar Citas en Lista y Calendario
+    // 6. Cargar Citas en Lista y Calendario con diferenciación por usuario
     async function cargarCitas() {
         const datos = {
             accion: "obtener_citas",
@@ -704,24 +778,57 @@
         }
 
         if (resultado.success && resultado.citas && resultado.citas.length > 0) {
+            
+            // Recorrer citas y dibujarlas
             resultado.citas.forEach(cita => {
-                // Agregar evento al Calendario
+                // Identificar el usuario creador de la cita
+                const usuarioNombre = cita.usuario || cita.idUsuario || miNombreUsuario;
+                const colorUsuario = obtenerColorUsuario(usuarioNombre);
+                
+                // Formatear el texto que aparecerá (Para Admin: "usuario: título")
+                const tituloMostrar = (miRol === 'admin') 
+                    ? `${usuarioNombre}: ${cita.titulo}` 
+                    : cita.titulo;
+
+                // Agregar evento al Calendario visual
                 if (calendar) {
                     calendar.addEvent({
                         id: cita.idCita,
-                        title: cita.titulo,
+                        title: tituloMostrar,
                         start: cita.fechaHora,
-                        extendedProps: { detalles: cita.detalles }
+                        backgroundColor: colorUsuario,
+                        borderColor: colorUsuario,
+                        textColor: "#ffffff",
+                        extendedProps: { 
+                            detalles: cita.detalles,
+                            usuario: usuarioNombre
+                        }
                     });
                 }
 
-                // Agregar elemento a la Lista
+                // Crear elemento en la Lista
                 const li = document.createElement("li");
+                li.style.borderLeft = `5px solid ${colorUsuario}`;
                 
+                // Badge de usuario (si es Admin)
+                if (miRol === 'admin') {
+                    const headerUser = document.createElement("div");
+                    headerUser.className = "cita-header-user";
+
+                    const tagUser = document.createElement("span");
+                    tagUser.className = "tag-usuario";
+                    tagUser.style.backgroundColor = colorUsuario;
+                    tagUser.textContent = `👤 ${usuarioNombre}`;
+
+                    headerUser.appendChild(tagUser);
+                    li.appendChild(headerUser);
+                }
+
                 const titulo = document.createElement("strong");
                 titulo.textContent = cita.titulo;
                 
                 const fecha = document.createElement("span");
+                fecha.className = "fecha-texto";
                 fecha.textContent = `⏰ ${cita.fechaHora.replace("T", " - ")} hrs`;
                 
                 const detalles = document.createElement("small");
@@ -739,6 +846,12 @@
                 
                 lista.appendChild(li);
             });
+
+            // Actualizar Leyenda de Colores si es Administrador
+            if (miRol === 'admin') {
+                actualizarLeyendaAdmin();
+            }
+
         } else {
             const li = document.createElement("li");
             li.textContent = "No hay citas agendadas actualmente.";
@@ -746,6 +859,22 @@
             li.style.color = "var(--text-muted)";
             lista.appendChild(li);
         }
+    }
+
+    // Muestra la leyenda de usuarios y sus colores asignados
+    function actualizarLeyendaAdmin() {
+        const contenedorLeyenda = document.getElementById("leyenda-usuarios");
+        if (!contenedorLeyenda) return;
+        contenedorLeyenda.innerHTML = "";
+
+        Object.keys(mapaColoresUsuario).forEach(userKey => {
+            const color = mapaColoresUsuario[userKey];
+            const chip = document.createElement("span");
+            chip.className = "leyenda-chip";
+            chip.style.backgroundColor = color;
+            chip.textContent = `👤 ${userKey}`;
+            contenedorLeyenda.appendChild(chip);
+        });
     }
 
     // 7. Editar Cita
