@@ -1,5 +1,5 @@
-// 🔴 IMPORTANTE: Reemplaza esto con el ID real de tu Google Sheet
-const ID_HOJA = '1p8uJ3...'; // Obtén este ID de la URL: https://docs.google.com/spreadsheets/d/AQUI_ESTA_EL_ID/edit
+// ✅ ID DE TU GOOGLE SHEET - ACTUALIZADO
+const ID_HOJA = '1jl9zsfRKMqAo51wDNaf5QB14bRPaEZpBo3t0VfZhO2E';
 
 function doPost(e) {
   const data = JSON.parse(e.postData.contents);
