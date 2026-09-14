@@ -57,9 +57,8 @@
 
 <!-- SCRIPT CORREGIDO -->
 <script>
-    // 🔒 IMPORTANTE: Guarda la URL en variables de entorno o en un servidor backend seguro
-    // Esta es una URL de ejemplo - NUNCA expongas URLs reales en el código fuente
-    const API_URL = localStorage.getItem("API_URL") || "https://script.google.com/macros/s/AKfycbz2xUhaWGmjPTCmCiNO8e2Z6EaZhvrbJZGIwYmI6bu97-mvF-uD8x02Qt6hmVpxMuiaXQ/exec";
+    // ✅ URL ACTUALIZADA DE GOOGLE APPS SCRIPT
+    const API_URL = "https://script.google.com/macros/s/AKfycbz2xUhaWGmjPTCmCiNO8e2Z6EaZhvrbJZGIwYmI6bu97-mvF-uD8x02Qt6hmVpxMuiaXQ/exec";
     
     // Variables temporales del usuario que inicia sesión
     let miIdUsuario = "";
@@ -118,16 +117,15 @@
             contrasena: contrasena
         });
 
-        if(resultado.success && resultado.token) {
-            // ✅ Guardar token de sesión (NO el usuario directamente)
-            miToken = resultado.token;
+        if(resultado.success) {
+            // ✅ Guardar datos del usuario
             miIdUsuario = resultado.idUsuario;
             miRol = resultado.rol || "user";
 
             // Ocultar login y mostrar panel
             document.getElementById("pantalla-login").classList.add("oculto");
             document.getElementById("pantalla-panel").classList.remove("oculto");
-            document.getElementById("mensaje-bienvenida").innerText = `Bienvenido, ${escapeHtml(miIdUsuario)} (Rol: ${escapeHtml(miRol)})`;
+            document.getElementById("mensaje-bienvenida").innerText = `Bienvenido, ${escapeHtml(resultado.usuario)} (Rol: ${escapeHtml(miRol)})`;
             
             cargarCitas();
         } else {
