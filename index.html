@@ -57,7 +57,7 @@
 
 <!-- SCRIPT CORREGIDO -->
 <script>
-    // ✅ URL CON /exec (CORS se maneja en el servidor)
+    // ✅ URL CON /exec
     const API_URL = "https://script.google.com/macros/s/AKfycby3dVoEyNauCXQQ2Qec_w471aeUOHNEj6ezQAV2cD874-Bg3lUFzbfFcirGwyO0myAzJg/exec";
     
     // Variables temporales del usuario que inicia sesión
@@ -72,15 +72,16 @@
                 method: "POST",
                 body: JSON.stringify(datosPayload),
                 headers: { 
-                    "Content-Type": "application/json"
-                },
-                mode: "no-cors"
+                    "Content-Type": "text/plain"
+                }
             });
 
-            // ✅ Con mode: "no-cors", la respuesta es opaca
-            // Asumimos que fue exitosa si no hay error de red
-            const resultado = await response.text();
-            return JSON.parse(resultado);
+            // ✅ Leer la respuesta como texto y parsear JSON
+            const textoRespuesta = await response.text();
+            console.log("Respuesta del servidor:", textoRespuesta);
+            
+            const resultado = JSON.parse(textoRespuesta);
+            return resultado;
             
         } catch (error) {
             console.error("Error en peticionBackend:", error);
