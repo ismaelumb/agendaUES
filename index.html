@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agenda del Sistema</title>
+    <style>
+        /* Un poco de diseño básico (CSS) para que no se vea feo */
+        body { font-family: Arial, sans-serif; padding: 20px; background: #f4f4f4; }
+        .contenedor { max-width: 600px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; }
+        input, button { width: 100%; padding: 10px; margin: 5px 0; box-sizing: border-box; }
+        button { background: #28a745; color: white; border: none; cursor: pointer; font-weight: bold; }
+        button:hover { background: #218838; }
+        .oculto { display: none; }
+    </style>
+</head>
+<body>
+
+<div class="contenedor">
+    <h1>Sistema de Agenda</h1>
+    
+    <!-- PANTALLA 1: INICIO DE SESIÓN -->
+    <div id="pantalla-login">
+        <h3>Iniciar Sesión</h3>
+        <input type="text" id="input-usuario" placeholder="ID de Usuario (Ej. user123)">
+        <!-- Nota: Para este ejemplo básico, usaremos el ID de usuario directamente -->
+        <button onclick="iniciarSesion()">Entrar</button>
+    </div>
+
+    <!-- PANTALLA 2: PANEL DE CONTROL (Se muestra después de entrar) -->
+    <div id="pantalla-panel" class="oculto">
+        <h3 id="mensaje-bienvenida">Bienvenido</h3>
+        
+        <hr>
+        <h4>Agendar Nueva Cita</h4>
+        <input type="text" id="cita-titulo" placeholder="Título (Ej. Reunión de proyecto)">
+        <input type="datetime-local" id="cita-fecha">
+        <input type="text" id="cita-detalles" placeholder="Detalles de la actividad">
+        <button onclick="crearNuevaCita()">Agendar Actividad</button>
+
+        <hr>
+        <h4>Mis Citas</h4>
+        <button onclick="cargarCitas()" style="background: #007bff;">Actualizar Lista</button>
+        <ul id="lista-citas">
+            <!-- Aquí aparecerán las citas automáticamente -->
+        </ul>
+    </div>
+</div>
+
+<!-- AQUÍ VA EL CÓDIGO JAVASCRIPT QUE TE DI (El motor de la página) -->
+<script>
+    // PEGA AQUÍ TU URL DE GOOGLE APPS SCRIPT
+    const API_URL = "https://script.google.com/macros/s/AKfycbwNpbCElFzwhEGvRtSD0y76Onfr12VNGHK-rhE9rQzhbAoEOGbboyj3T_zI1t3P8xAOFQ/exec"; 
+    
+    // Variables temporales del usuario que inicia sesión
+    let miIdUsuario = "";
+    let miRol = "user"; // Por defecto es usuario normal
+
+    // 1. Función genérica para hablar con Google Sheets
+    async function peticionBackend(datosPayload) {
+        try {
+            const response = await fetch(API_URL, {
+                method: "POST",
+                body: JSON.stringify(datosPayload),
+                headers: { "Content-Type": "text/plain;charset=utf-8" } 
+            });
+            return await response.json();
+        } catch (error) {
+            alert("Error al conectar con la base de datos.");
+            console.error(error);
+        }
+    }
+
+    // 2. Simulación de Inicio de Sesión
+    function iniciarSesion() {
+        const inputId = document.getElementById("input-usuario").value;
+        if(inputId === "") {
+            alert("Ingresa un usuario");
+            return;
+        }
+        
+        miIdUsuario = inputId;
+        // Si el usuario es "admin1", le damos el rol de administrador
+        if(miIdUsuario === "admin1") {
+            miRol = "admin";
+        }
+
+        // Ocultar login y mostrar panel
+        document.getElementById("pantalla-login").classList.add("oculto");
+        document.getElementById("pantalla-panel").classList.remove("oculto");
+        document.getElementById("mensaje-bienvenida").innerText = "Bienvenido, " + miIdUsuario + " (Rol: " + miRol + ")";
+        
+        cargarCitas(); // Cargar las citas apenas entra
+    }
+
+    // 3. Crear una Cita
+    async function crearNuevaCita() {
+        const titulo = document.getElementById("cita-titulo").value;
+        const fecha = document.getElementById("cita-fecha").value;
+        const detalles = document.getElementById("cita-detalles").value;
+
+        if(!titulo || !fecha) {
+            alert("Título y Fecha son obligatorios");
+            return;
+        }
+
+        const datos = {
+            accion: "crear_cita",
+            idUsuario: miIdUsuario,
+            titulo: titulo,
+            fechaHora: fecha,
+            detalles: detalles
+        };
+
+        const resultado = await peticionBackend(datos);
+        if (resultado.success) {
+            alert("¡Cita agendada con éxito!");
+            cargarCitas(); // Refrescar la lista
+        }
+    }
+
+    // 4. Cargar Citas
+    async function cargarCitas() {
+        const datos = {
+            accion: "obtener_citas",
+            idUsuario: miIdUsuario,
+            rol: miRol
+        };
+
+        const resultado = await peticionBackend(datos);
+        const lista = document.getElementById("lista-citas");
+        lista.innerHTML = ""; // Limpiar lista actual
+
+        if (resultado.success && resultado.citas) {
+            resultado.citas.forEach(cita => {
+                const li = document.createElement("li");
+                li.innerHTML = `
+                    <strong>${cita.titulo}</strong> - ${cita.fechaHora.replace("T", " ")} 
+                    <br> <small>${cita.detalles}</small>
+                    <button onclick="editarMiCita('${cita.idCita}')" style="background:#ffc107; color:black; padding:5px; margin-top:5px;">✏️ Editar (Solo hora/título)</button>
+                    <hr>
+                `;
+                lista.appendChild(li);
+            });
+        }
+    }
+
+    // 5. Editar Cita (Llama a tu regla de 1 hora)
+    async function editarMiCita(idCita) {
+        const nuevoTitulo = prompt("Escribe el nuevo título:");
+        const nuevaFecha = prompt("Escribe la nueva fecha (Ej. 2026-10-15T10:00):");
+
+        if(!nuevoTitulo || !nuevaFecha) return;
+
+        const datos = {
+            accion: "editar_cita",
+            idCita: idCita,
+            idUsuario: miIdUsuario,
+            titulo: nuevoTitulo,
+            fechaHora: nuevaFecha,
+            detalles: "Editado por el usuario"
+        };
+
+        const resultado = await peticionBackend(datos);
+        if (resultado.success) {
+            alert("Cita actualizada.");
+            cargarCitas();
+        } else {
+            alert("Error: " + resultado.mensaje); // Aquí Google Sheets avisará si falta menos de 1 hora
+        }
+    }
+</script>
+
+</body>
+</html>
