@@ -596,15 +596,26 @@
     
     var mapaColoresUsuario = {};
 
-    function obtenerColorUsuario(nombreUsuario) {
-        if (!nombreUsuario) return "#4f46e5";
-        var key = nombreUsuario.toLowerCase().trim();
-        if (!mapaColoresUsuario[key]) {
-            var totalRegistrados = Object.keys(mapaColoresUsuario).length;
-            mapaColoresUsuario[key] = PALETA_COLORES[totalRegistrados % PALETA_COLORES.length];
-        }
-        return mapaColoresUsuario[key];
-    }
+function obtenerColorUsuario(nombreUsuario) {
+  // Se convierte cualquier valor (null, undefined, objeto, número) a String de forma segura
+  const nombre = (typeof nombreUsuario === 'string' 
+    ? nombreUsuario 
+    : (nombreUsuario && typeof nombreUsuario === 'object' 
+        ? nombreUsuario.nombre || nombreUsuario.name || '' 
+        : String(nombreUsuario || ''))
+  ).toLowerCase();
+
+  // --- CONSERVA EL RESTO DE TU LÓGICA INTERNA DE LA FUNCIÓN ---
+  // Si en tu lógica usabas 'nombreUsuario.toLowerCase()', ahora usa la variable 'nombre':
+  
+  /* Ejemplo de cómo continúa tu código actual:
+  let hash = 0;
+  for (let i = 0; i < nombre.length; i++) {
+      hash = nombre.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  return colores[Math.abs(hash) % colores.length];
+  */
+}
 
     function inicializarCalendario() {
         var calendarEl = document.getElementById('calendar');
