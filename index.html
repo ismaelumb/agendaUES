@@ -3,27 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Agenda del Sistema</title>
+    <title>Sistema de Agenda y Citas</title>
+
+    <!-- Librería FullCalendar CSS y JS -->
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
+
     <style>
-        /* Diseño básico responsive */
         body { 
             font-family: Arial, sans-serif; 
             padding: 20px; 
-            background: #f4f4f4; 
+            background: #f4f7f6; 
             margin: 0;
         }
         .contenedor { 
-            max-width: 600px; 
+            max-width: 900px; 
             margin: 0 auto; 
             background: white; 
-            padding: 20px; 
+            padding: 25px; 
             border-radius: 8px; 
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1); 
         }
         input, button { 
             width: 100%; 
             padding: 10px; 
-            margin: 5px 0; 
+            margin: 6px 0; 
             box-sizing: border-box; 
             border: 1px solid #ccc;
             border-radius: 4px;
@@ -53,6 +56,17 @@
             border-radius: 4px; 
             border-left: 4px solid #ffc107;
         }
+        .seccion-admin {
+            background: #e9ecef;
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 25px;
+            border-left: 5px solid #17a2b8;
+        }
+        #calendar {
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
         ul { 
             list-style: none; 
             padding: 0; 
@@ -69,14 +83,14 @@
 <body>
 
 <div class="contenedor">
-    <h1>Sistema de Agenda</h1>
+    <h1>Sistema de Agenda y Citas</h1>
     
     <!-- PANTALLA 1: INICIO DE SESIÓN -->
     <div id="pantalla-login">
         <h3>Iniciar Sesión</h3>
         <div class="warning">
-            ⚠️ Este sistema requiere autenticación con usuario y contraseña.<br>
-            Consulta con el administrador si no tienes credenciales.
+            ⚠️ Este sistema requiere autenticación.<br>
+            Ingresa tus credenciales de usuario.
         </div>
         <input type="text" id="input-usuario" placeholder="Usuario">
         <input type="password" id="input-contrasena" placeholder="Contraseña">
@@ -86,10 +100,23 @@
 
     <!-- PANTALLA 2: PANEL DE CONTROL -->
     <div id="pantalla-panel" class="oculto">
-        <h3 id="mensaje-bienvenida">Bienvenido</h3>
-        <button onclick="cerrarSesion()" style="background: #dc3545; margin-bottom: 10px;">Cerrar Sesión</button>
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <h3 id="mensaje-bienvenida" style="margin: 0;">Bienvenido</h3>
+            <button onclick="cerrarSesion()" style="background: #dc3545; width: auto; padding: 8px 15px;">Cerrar Sesión</button>
+        </div>
         
         <hr>
+
+        <!-- 📅 CALENDARIO VISUAL -->
+        <h4>📅 Calendario de Actividades</h4>
+        <p style="font-size: 0.9em; color: #666;">
+            💡 Haz clic en cualquier día del calendario para seleccionar la fecha de agendamiento.
+        </p>
+        <div id="calendar"></div>
+
+        <hr>
+
+        <!-- 📝 FORMULARIO DE CREAR CITA -->
         <h4>Agendar Nueva Cita</h4>
         <input type="text" id="cita-titulo" placeholder="Título (Ej. Reunión de proyecto)">
         <input type="datetime-local" id="cita-fecha">
@@ -97,43 +124,73 @@
         <button onclick="crearNuevaCita()">Agendar Actividad</button>
 
         <hr>
-        <h4>Mis Citas</h4>
-        <button onclick="cargarCitas()" style="background: #007bff;">Actualizar Lista</button>
+
+        <!-- 📋 LISTA DETALLADA DE CITAS -->
+        <h4>Mis Citas Agendadas</h4>
+        <button onclick="cargarCitas()" style="background: #007bff; margin-bottom: 10px;">🔄 Actualizar Calendario y Citas</button>
         <ul id="lista-citas">
-            <!-- Las citas aparecerán aquí dinámicamente -->
+            <!-- Citas cargadas dinámicamente -->
         </ul>
+
+        <!-- 🛠️ SECCIÓN EXCLUSIVA DE ADMINISTRADOR -->
+        <div id="seccion-admin" class="seccion-admin oculto">
+            <h4>🛠️ Panel de Administración - Crear Usuarios</h4>
+            <p style="font-size: 0.9em; color: #555;">Crea cuentas para que otros usuarios accedan al sistema:</p>
+            <input type="text" id="admin-usuario" placeholder="Nombre de nuevo usuario">
+            <input type="password" id="admin-contrasena" placeholder="Contraseña inicial">
+            <button onclick="crearUsuarioPorAdmin()" style="background: #17a2b8;">Crear Nuevo Usuario</button>
+        </div>
     </div>
 </div>
 
 <script>
-    // URL de tu Web App publicada en Google Apps Script
-    const API_URL = "https://script.google.com/macros/s/AKfycbwa3i_9q-Y_AlU25Ok22NmpWgX1ghBmVeoenlm9ucuNtdec5jjAJA4KbOwIsvgOM6R7Ew/exec";
+    const API_URL = "https://script.google.com/macros/s/AKfycbzaZ3EBZiv9-C9yTWOwoTfNCihpn5L9Kgol_NAGqd4gTxBy7YBBwdJLNatbeP8Fl6QLuQ/exec";
     
     let miIdUsuario = "";
     let miRol = "user";
+    let miNombreUsuario = "";
+    let calendar;
 
-    // 1. Función para realizar peticiones POST al backend
+    // 1. Inicializar el Calendario Interactivo
+    function inicializarCalendario() {
+        const calendarEl = document.getElementById('calendar');
+        calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            locale: 'es',
+            headerToolbar: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'dayGridMonth,timeGridWeek'
+            },
+            dateClick: function(info) {
+                // Al hacer clic en un día del calendario, pone esa fecha en el formulario
+                document.getElementById('cita-fecha').value = info.dateStr + "T09:00";
+                alert("📅 Fecha seleccionada: " + info.dateStr + "\nCompleta el título y haz clic en 'Agendar Actividad'.");
+            },
+            eventClick: function(info) {
+                alert("📌 Cita: " + info.event.title + "\n📝 Detalles: " + (info.event.extendedProps.detalles || "Sin detalles"));
+            }
+        });
+        calendar.render();
+    }
+
+    // 2. Petición POST Genérica
     async function peticionBackend(datosPayload) {
         try {
             const response = await fetch(API_URL, {
                 method: "POST",
                 body: JSON.stringify(datosPayload),
-                headers: { 
-                    "Content-Type": "text/plain"
-                }
+                headers: { "Content-Type": "text/plain" }
             });
-
             const textoRespuesta = await response.text();
-            console.log("Respuesta del servidor:", textoRespuesta);
             return JSON.parse(textoRespuesta);
-            
         } catch (error) {
-            console.error("Error en peticionBackend:", error);
+            console.error("Error backend:", error);
             return { success: false, mensaje: "Error de conexión: " + error.message };
         }
     }
 
-    // 2. Inicio de Sesión
+    // 3. Inicio de Sesión
     async function iniciarSesion() {
         const usuario = document.getElementById("input-usuario").value.trim();
         const contrasena = document.getElementById("input-contrasena").value.trim();
@@ -156,19 +213,32 @@
         if (resultado.success) {
             miIdUsuario = resultado.idUsuario;
             miRol = resultado.rol || "user";
+            miNombreUsuario = resultado.usuario;
 
             document.getElementById("pantalla-login").classList.add("oculto");
             document.getElementById("pantalla-panel").classList.remove("oculto");
-            document.getElementById("mensaje-bienvenida").innerText = `Bienvenido, ${escapeHtml(resultado.usuario)} (Rol: ${escapeHtml(miRol)})`;
+            document.getElementById("mensaje-bienvenida").innerText = `Hola, ${escapeHtml(miNombreUsuario)} (${miRol.toUpperCase()})`;
             
-            cargarCitas();
+            // Mostrar u ocultar Panel Admin
+            if (miRol === 'admin') {
+                document.getElementById("seccion-admin").classList.remove("oculto");
+            } else {
+                document.getElementById("seccion-admin").classList.add("oculto");
+            }
+
+            // Inicializar y renderizar calendario
+            setTimeout(() => {
+                inicializarCalendario();
+                cargarCitas();
+            }, 200);
+
         } else {
-            errorDiv.textContent = `❌ ${resultado.mensaje || "Credenciales inválidas"}`;
+            errorDiv.textContent = `❌ ${resultado.mensaje || "Credenciales incorrectas"}`;
             errorDiv.style.display = "block";
         }
     }
 
-    // 3. Cerrar Sesión
+    // 4. Cerrar Sesión
     function cerrarSesion() {
         miIdUsuario = "";
         miRol = "user";
@@ -183,7 +253,7 @@
         document.getElementById("pantalla-login").classList.remove("oculto");
     }
 
-    // 4. Crear Nueva Cita
+    // 5. Crear Nueva Cita
     async function crearNuevaCita() {
         const titulo = document.getElementById("cita-titulo").value.trim();
         const fecha = document.getElementById("cita-fecha").value;
@@ -214,7 +284,7 @@
         }
     }
 
-    // 5. Cargar Citas
+    // 6. Cargar Citas en Lista y Calendario
     async function cargarCitas() {
         const datos = {
             accion: "obtener_citas",
@@ -226,8 +296,23 @@
         const lista = document.getElementById("lista-citas");
         lista.innerHTML = "";
 
+        if (calendar) {
+            calendar.removeAllEvents();
+        }
+
         if (resultado.success && resultado.citas && resultado.citas.length > 0) {
             resultado.citas.forEach(cita => {
+                // Agregar evento al Calendario
+                if (calendar) {
+                    calendar.addEvent({
+                        id: cita.idCita,
+                        title: cita.titulo,
+                        start: cita.fechaHora,
+                        extendedProps: { detalles: cita.detalles }
+                    });
+                }
+
+                // Agregar elemento a la Lista
                 const li = document.createElement("li");
                 
                 const titulo = document.createElement("strong");
@@ -264,7 +349,7 @@
         }
     }
 
-    // 6. Editar Cita
+    // 7. Editar Cita
     async function editarMiCita(cita) {
         const nuevoTitulo = prompt("Escribe el nuevo título:", cita.titulo);
         const nuevaFecha = prompt("Escribe la nueva fecha (Año-Mes-DíaTHora:Min):", cita.fechaHora);
@@ -290,7 +375,34 @@
         }
     }
 
-    // 7. Escapar HTML para seguridad
+    // 8. Crear Usuario por Administrador
+    async function crearUsuarioPorAdmin() {
+        const nuevoUser = document.getElementById("admin-usuario").value.trim();
+        const nuevaPass = document.getElementById("admin-contrasena").value.trim();
+
+        if (!nuevoUser || !nuevaPass) {
+            alert("❌ Ingresa el nombre de usuario y contraseña");
+            return;
+        }
+
+        const datos = {
+            accion: "crear_usuario",
+            idUsuario: miIdUsuario,
+            rolActual: miRol,
+            nuevoUsuario: nuevoUser,
+            nuevaContrasena: nuevaPass
+        };
+
+        const resultado = await peticionBackend(datos);
+        if (resultado.success) {
+            alert(`✅ Usuario '${nuevoUser}' creado con éxito en Google Sheets.`);
+            document.getElementById("admin-usuario").value = "";
+            document.getElementById("admin-contrasena").value = "";
+        } else {
+            alert(`❌ Error: ${resultado.mensaje || "No se pudo crear el usuario"}`);
+        }
+    }
+
     function escapeHtml(texto) {
         const div = document.createElement("div");
         div.textContent = texto;
