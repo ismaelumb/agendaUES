@@ -5,15 +5,65 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Agenda del Sistema</title>
     <style>
-        /* Un poco de diseño básico (CSS) para que no se vea feo */
-        body { font-family: Arial, sans-serif; padding: 20px; background: #f4f4f4; }
-        .contenedor { max-width: 600px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; }
-        input, button { width: 100%; padding: 10px; margin: 5px 0; box-sizing: border-box; }
-        button { background: #28a745; color: white; border: none; cursor: pointer; font-weight: bold; }
-        button:hover { background: #218838; }
-        .oculto { display: none; }
-        .error { color: #dc3545; font-weight: bold; }
-        .warning { background: #fff3cd; padding: 10px; margin: 10px 0; border-radius: 4px; }
+        /* Diseño básico responsive */
+        body { 
+            font-family: Arial, sans-serif; 
+            padding: 20px; 
+            background: #f4f4f4; 
+            margin: 0;
+        }
+        .contenedor { 
+            max-width: 600px; 
+            margin: 0 auto; 
+            background: white; 
+            padding: 20px; 
+            border-radius: 8px; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
+        }
+        input, button { 
+            width: 100%; 
+            padding: 10px; 
+            margin: 5px 0; 
+            box-sizing: border-box; 
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button { 
+            background: #28a745; 
+            color: white; 
+            border: none; 
+            cursor: pointer; 
+            font-weight: bold; 
+            transition: background 0.2s;
+        }
+        button:hover { 
+            background: #218838; 
+        }
+        .oculto { 
+            display: none; 
+        }
+        .error { 
+            color: #dc3545; 
+            font-weight: bold; 
+        }
+        .warning { 
+            background: #fff3cd; 
+            padding: 10px; 
+            margin: 10px 0; 
+            border-radius: 4px; 
+            border-left: 4px solid #ffc107;
+        }
+        ul { 
+            list-style: none; 
+            padding: 0; 
+        }
+        li { 
+            background: #f9f9f9; 
+            margin: 10px 0; 
+            padding: 12px; 
+            border-radius: 4px; 
+            border-left: 4px solid #007bff; 
+        }
     </style>
 </head>
 <body>
@@ -34,7 +84,7 @@
         <div id="error-login" class="error" style="display: none; margin-top: 10px;"></div>
     </div>
 
-    <!-- PANTALLA 2: PANEL DE CONTROL (Se muestra después de entrar) -->
+    <!-- PANTALLA 2: PANEL DE CONTROL -->
     <div id="pantalla-panel" class="oculto">
         <h3 id="mensaje-bienvenida">Bienvenido</h3>
         <button onclick="cerrarSesion()" style="background: #dc3545; margin-bottom: 10px;">Cerrar Sesión</button>
@@ -50,22 +100,19 @@
         <h4>Mis Citas</h4>
         <button onclick="cargarCitas()" style="background: #007bff;">Actualizar Lista</button>
         <ul id="lista-citas">
-            <!-- Aquí aparecerán las citas automáticamente -->
+            <!-- Las citas aparecerán aquí dinámicamente -->
         </ul>
     </div>
 </div>
 
-<!-- SCRIPT CORREGIDO -->
 <script>
-    // ✅ URL CON /exec
-    const API_URL = "https://script.google.com/macros/s/AKfycbxAfZkB2_A3RujpOFPjE3WixGSNr7Bb7UvF-suqrmjIHrsOl5CXCuRJDXqCaoHO5BYXfQ/exec";
+    // URL de tu Web App publicada en Google Apps Script
+    const API_URL = "https://script.google.com/macros/s/AKfycbwa3i_9q-Y_AlU25Ok22NmpWgX1ghBmVeoenlm9ucuNtdec5jjAJA4KbOwIsvgOM6R7Ew/exec";
     
-    // Variables temporales del usuario que inicia sesión
     let miIdUsuario = "";
     let miRol = "user";
-    let miToken = null;
 
-    // 1. Función genérica mejorada para hablar con el backend
+    // 1. Función para realizar peticiones POST al backend
     async function peticionBackend(datosPayload) {
         try {
             const response = await fetch(API_URL, {
@@ -76,12 +123,9 @@
                 }
             });
 
-            // ✅ Leer la respuesta como texto y parsear JSON
             const textoRespuesta = await response.text();
             console.log("Respuesta del servidor:", textoRespuesta);
-            
-            const resultado = JSON.parse(textoRespuesta);
-            return resultado;
+            return JSON.parse(textoRespuesta);
             
         } catch (error) {
             console.error("Error en peticionBackend:", error);
@@ -89,33 +133,30 @@
         }
     }
 
-    // 2. Inicio de Sesión SEGURO (requiere usuario + contraseña)
+    // 2. Inicio de Sesión
     async function iniciarSesion() {
         const usuario = document.getElementById("input-usuario").value.trim();
-        const contrasena = document.getElementById("input-contrasena").value;
+        const contrasena = document.getElementById("input-contrasena").value.trim();
         const errorDiv = document.getElementById("error-login");
 
         errorDiv.style.display = "none";
 
-        if(!usuario || !contrasena) {
+        if (!usuario || !contrasena) {
             errorDiv.textContent = "❌ Usuario y contraseña son obligatorios";
             errorDiv.style.display = "block";
             return;
         }
 
-        // ✅ Enviar las credenciales al backend para validarlas
         const resultado = await peticionBackend({
             accion: "login",
             usuario: usuario,
             contrasena: contrasena
         });
 
-        if(resultado.success) {
-            // ✅ Guardar datos del usuario
+        if (resultado.success) {
             miIdUsuario = resultado.idUsuario;
             miRol = resultado.rol || "user";
 
-            // Ocultar login y mostrar panel
             document.getElementById("pantalla-login").classList.add("oculto");
             document.getElementById("pantalla-panel").classList.remove("oculto");
             document.getElementById("mensaje-bienvenida").innerText = `Bienvenido, ${escapeHtml(resultado.usuario)} (Rol: ${escapeHtml(miRol)})`;
@@ -131,27 +172,24 @@
     function cerrarSesion() {
         miIdUsuario = "";
         miRol = "user";
-        miToken = null;
 
-        // Limpiar formularios
         document.getElementById("input-usuario").value = "";
         document.getElementById("input-contrasena").value = "";
         document.getElementById("cita-titulo").value = "";
         document.getElementById("cita-fecha").value = "";
         document.getElementById("cita-detalles").value = "";
 
-        // Volver a pantalla de login
         document.getElementById("pantalla-panel").classList.add("oculto");
         document.getElementById("pantalla-login").classList.remove("oculto");
     }
 
-    // 4. Crear una Cita
+    // 4. Crear Nueva Cita
     async function crearNuevaCita() {
         const titulo = document.getElementById("cita-titulo").value.trim();
         const fecha = document.getElementById("cita-fecha").value;
         const detalles = document.getElementById("cita-detalles").value.trim();
 
-        if(!titulo || !fecha) {
+        if (!titulo || !fecha) {
             alert("❌ Título y Fecha son obligatorios");
             return;
         }
@@ -167,12 +205,9 @@
         const resultado = await peticionBackend(datos);
         if (resultado.success) {
             alert("✅ ¡Cita agendada con éxito!");
-            
-            // Limpiar inputs
             document.getElementById("cita-titulo").value = "";
             document.getElementById("cita-fecha").value = "";
             document.getElementById("cita-detalles").value = "";
-            
             cargarCitas();
         } else {
             alert(`❌ Error: ${resultado.mensaje || "No se pudo crear la cita"}`);
@@ -193,7 +228,6 @@
 
         if (resultado.success && resultado.citas && resultado.citas.length > 0) {
             resultado.citas.forEach(cita => {
-                // ✅ Crear elementos con método seguro, NO innerHTML con template strings
                 const li = document.createElement("li");
                 
                 const titulo = document.createElement("strong");
@@ -203,62 +237,60 @@
                 fecha.textContent = ` - ${cita.fechaHora.replace("T", " ")}`;
                 
                 const detalles = document.createElement("small");
-                detalles.textContent = cita.detalles || "Sin detalles";
+                detalles.style.display = "block";
+                detalles.style.marginTop = "4px";
+                detalles.style.color = "#555";
+                detalles.textContent = cita.detalles || "Sin detalles adicionales";
                 
-                // Botón de editar
                 const btnEditar = document.createElement("button");
-                btnEditar.textContent = "✏️ Editar (Solo hora/título)";
+                btnEditar.textContent = "✏️ Editar Cita";
                 btnEditar.style.background = "#ffc107";
-                btnEditar.style.color = "black";
-                btnEditar.style.padding = "5px";
-                btnEditar.style.marginTop = "5px";
-                btnEditar.onclick = () => editarMiCita(cita.idCita);
-                
-                const hr = document.createElement("hr");
+                btnEditar.style.color = "#000";
+                btnEditar.style.padding = "6px 10px";
+                btnEditar.style.marginTop = "8px";
+                btnEditar.onclick = () => editarMiCita(cita);
 
                 li.appendChild(titulo);
                 li.appendChild(fecha);
-                li.appendChild(document.createElement("br"));
                 li.appendChild(detalles);
-                li.appendChild(document.createElement("br"));
                 li.appendChild(btnEditar);
-                li.appendChild(hr);
                 
                 lista.appendChild(li);
             });
         } else {
             const li = document.createElement("li");
-            li.textContent = "No hay citas agendadas";
+            li.textContent = "No hay citas agendadas.";
             lista.appendChild(li);
         }
     }
 
     // 6. Editar Cita
-    async function editarMiCita(idCita) {
-        const nuevoTitulo = prompt("Escribe el nuevo título:");
-        const nuevaFecha = prompt("Escribe la nueva fecha (Ej. 2026-10-15T10:00):");
+    async function editarMiCita(cita) {
+        const nuevoTitulo = prompt("Escribe el nuevo título:", cita.titulo);
+        const nuevaFecha = prompt("Escribe la nueva fecha (Año-Mes-DíaTHora:Min):", cita.fechaHora);
+        const nuevosDetalles = prompt("Detalles adicionales:", cita.detalles || "");
 
-        if(!nuevoTitulo || !nuevaFecha) return;
+        if (!nuevoTitulo || !nuevaFecha) return;
 
         const datos = {
             accion: "editar_cita",
-            idCita: idCita,
+            idCita: cita.idCita,
             idUsuario: miIdUsuario,
             titulo: nuevoTitulo.trim(),
             fechaHora: nuevaFecha,
-            detalles: "Editado por el usuario"
+            detalles: nuevosDetalles ? nuevosDetalles.trim() : cita.detalles
         };
 
         const resultado = await peticionBackend(datos);
         if (resultado.success) {
-            alert("✅ Cita actualizada.");
+            alert("✅ Cita actualizada correctamente.");
             cargarCitas();
         } else {
             alert(`❌ Error: ${resultado.mensaje || "No se pudo editar la cita"}`);
         }
     }
 
-    // 7. Función auxiliar: Escapar HTML para prevenir XSS
+    // 7. Escapar HTML para seguridad
     function escapeHtml(texto) {
         const div = document.createElement("div");
         div.textContent = texto;
