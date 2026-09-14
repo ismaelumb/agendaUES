@@ -5,25 +5,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistema de Agenda y Citas</title>
 
-    <!-- Librería FullCalendar CSS y JS -->
+    <!-- Fuente Inter y FullCalendar -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
 
     <style>
         :root {
-            --bg-body: #f8fafc;
-            --bg-surface: #ffffff;
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --primary-light: #e0e7ff;
+            --bg-main: #f8fafc;
+            --surface: #ffffff;
             --border: #e2e8f0;
-            --border-hover: #cbd5e1;
-            --text-primary: #0f172a;
-            --text-secondary: #475569;
+            --text-title: #0f172a;
+            --text-body: #334155;
             --text-muted: #64748b;
-            --primary: #2563eb;
-            --primary-hover: #1d4ed8;
-            --danger: #dc2626;
-            --danger-hover: #b91c1c;
-            --admin-bg: #f1f5f9;
-            --admin-border: #94a3b8;
-            --radius: 6px;
+            --danger: #ef4444;
+            --danger-hover: #dc2626;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+            --radius: 10px;
         }
 
         * {
@@ -33,9 +36,9 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--bg-body);
-            color: var(--text-primary);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-body);
             line-height: 1.5;
             -webkit-font-smoothing: antialiased;
         }
@@ -52,151 +55,208 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 20px;
+            padding: 24px;
+            background: radial-gradient(circle at top left, #eef2ff, var(--bg-main));
         }
 
         .login-card {
-            background: var(--bg-surface);
+            background: var(--surface);
             border: 1px solid var(--border);
-            border-radius: var(--radius);
+            border-radius: 16px;
             width: 100%;
-            max-width: 400px;
-            padding: 32px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            max-width: 420px;
+            padding: 40px 32px;
+            box-shadow: var(--shadow-md);
+        }
+
+        .login-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .brand-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--primary);
+            color: white;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 18px;
         }
 
         .login-card h3 {
-            font-size: 1.25rem;
-            font-weight: 600;
-            margin-bottom: 8px;
-            color: var(--text-primary);
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--text-title);
+            margin-bottom: 6px;
         }
 
-        .warning-box {
-            background-color: #fefce8;
-            border: 1px solid #fef08a;
-            color: #854d0e;
-            padding: 12px;
-            border-radius: var(--radius);
+        .login-card p {
             font-size: 0.875rem;
-            margin-bottom: 20px;
+            color: var(--text-muted);
+            margin-bottom: 24px;
         }
 
         /* ----------------------------------
-           BARRA SUPERIOR (NAVBAR)
+           HEADER NAVBAR
         ----------------------------------- */
-        .header-bar {
-            background: var(--bg-surface);
+        .app-header {
+            background: var(--surface);
             border-bottom: 1px solid var(--border);
-            padding: 14px 24px;
+            padding: 14px 32px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 50;
         }
 
-        .header-title {
+        .header-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 700;
             font-size: 1.1rem;
-            font-weight: 600;
-            color: var(--text-primary);
+            color: var(--text-title);
         }
 
-        .header-user-info {
+        .user-menu {
             display: flex;
             align-items: center;
             gap: 16px;
         }
 
-        #mensaje-bienvenida {
-            font-size: 0.9rem;
-            color: var(--text-secondary);
+        .user-badge {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 6px 12px;
+            background: var(--bg-main);
+            border: 1px solid var(--border);
+            border-radius: 30px;
+            font-size: 0.875rem;
             font-weight: 500;
         }
 
-        /* ----------------------------------
-           LAYOUT DASHBOARD (PANEL)
-        ----------------------------------- */
-        .dashboard-container {
-            max-width: 1200px;
-            margin: 24px auto;
-            padding: 0 24px;
-            display: grid;
-            grid-template-columns: 1fr 360px;
-            gap: 24px;
+        .user-avatar {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 700;
         }
 
-        @media (max-width: 900px) {
-            .dashboard-container {
+        /* ----------------------------------
+           LAYOUT DASHBOARD
+        ----------------------------------- */
+        .dashboard-layout {
+            max-width: 1280px;
+            margin: 28px auto;
+            padding: 0 24px;
+            display: grid;
+            grid-template-columns: 1fr 380px;
+            gap: 28px;
+        }
+
+        @media (max-width: 992px) {
+            .dashboard-layout {
                 grid-template-columns: 1fr;
             }
         }
 
-        .panel-card {
-            background: var(--bg-surface);
+        .card {
+            background: var(--surface);
             border: 1px solid var(--border);
             border-radius: var(--radius);
-            padding: 20px;
+            padding: 24px;
+            box-shadow: var(--shadow-sm);
             margin-bottom: 24px;
         }
 
-        .panel-title {
-            font-size: 1rem;
-            font-weight: 600;
-            margin-bottom: 16px;
+        .card-header {
             display: flex;
             align-items: center;
             justify-content: space-between;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
             border-bottom: 1px solid var(--border);
-            padding-bottom: 10px;
+        }
+
+        .card-title {
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: var(--text-title);
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
         /* ----------------------------------
            FORMULARIOS & INPUTS
         ----------------------------------- */
         .form-group {
-            margin-bottom: 14px;
+            margin-bottom: 16px;
         }
 
         .form-group label {
             display: block;
-            font-size: 0.85rem;
-            font-weight: 500;
-            color: var(--text-secondary);
-            margin-bottom: 4px;
+            font-size: 0.825rem;
+            font-weight: 600;
+            color: var(--text-body);
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.025em;
         }
 
         input[type="text"],
         input[type="password"],
         input[type="datetime-local"] {
             width: 100%;
-            padding: 9px 12px;
+            padding: 10px 14px;
             font-size: 0.9rem;
-            background-color: #fff;
+            font-family: inherit;
+            background-color: var(--surface);
             border: 1px solid var(--border);
-            border-radius: var(--radius);
-            color: var(--text-primary);
-            transition: border-color 0.15s ease, box-shadow 0.15s ease;
+            border-radius: 8px;
+            color: var(--text-title);
+            transition: all 0.2s ease;
         }
 
         input:focus {
             outline: none;
             border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
         }
 
+        /* BOTONES */
         button {
             display: inline-flex;
             align-items: center;
             justify-content: center;
+            gap: 8px;
             width: 100%;
-            padding: 9px 16px;
+            padding: 10px 18px;
             font-size: 0.9rem;
-            font-weight: 500;
-            color: #fff;
+            font-weight: 600;
+            font-family: inherit;
+            color: #ffffff;
             background-color: var(--primary);
             border: 1px solid transparent;
-            border-radius: var(--radius);
+            border-radius: 8px;
             cursor: pointer;
-            transition: background-color 0.15s ease;
+            transition: all 0.2s ease;
+            box-shadow: var(--shadow-sm);
         }
 
         button:hover {
@@ -204,37 +264,50 @@
         }
 
         .btn-secondary {
-            background-color: #fff;
-            color: var(--text-primary);
+            background-color: var(--surface);
+            color: var(--text-body);
             border: 1px solid var(--border);
         }
 
         .btn-secondary:hover {
-            background-color: #f8fafc;
-            border-color: var(--border-hover);
+            background-color: var(--bg-main);
+            border-color: #cbd5e1;
         }
 
         .btn-danger {
-            background-color: var(--danger);
+            background-color: #fee2e2;
+            color: var(--danger);
+            border: 1px solid #fca5a5;
+            box-shadow: none;
         }
 
         .btn-danger:hover {
-            background-color: var(--danger-hover);
+            background-color: var(--danger);
+            color: #ffffff;
         }
 
-        .btn-warning {
-            background-color: #f59e0b;
-            color: #fff;
+        .btn-edit {
+            background-color: #fef3c7;
+            color: #92400e;
+            border: 1px solid #fde68a;
+            padding: 6px 12px;
+            font-size: 0.8rem;
+            width: auto;
+            border-radius: 6px;
         }
 
-        .btn-warning:hover {
-            background-color: #d97706;
+        .btn-edit:hover {
+            background-color: #fde68a;
         }
 
         .error {
+            background-color: #fef2f2;
+            border: 1px solid #fee2e2;
             color: var(--danger);
             font-size: 0.85rem;
-            margin-top: 8px;
+            padding: 10px;
+            border-radius: 8px;
+            margin-top: 14px;
         }
 
         /* ----------------------------------
@@ -242,78 +315,105 @@
         ----------------------------------- */
         #lista-citas {
             list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
         }
 
         #lista-citas li {
             border: 1px solid var(--border);
-            border-radius: var(--radius);
-            padding: 14px;
-            margin-bottom: 10px;
-            background-color: #fff;
+            border-left: 4px solid var(--primary);
+            border-radius: 8px;
+            padding: 14px 16px;
+            background-color: var(--surface);
             display: flex;
             flex-direction: column;
             gap: 4px;
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        #lista-citas li:hover {
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
         }
 
         #lista-citas li strong {
             font-size: 0.95rem;
-            color: var(--text-primary);
+            color: var(--text-title);
         }
 
         #lista-citas li span {
-            font-size: 0.85rem;
-            color: var(--text-muted);
+            font-size: 0.825rem;
+            color: var(--primary);
+            font-weight: 600;
         }
 
         #lista-citas li small {
             font-size: 0.85rem;
-            color: var(--text-secondary);
+            color: var(--text-muted);
             margin-top: 4px;
         }
 
         /* ----------------------------------
-           PANEL DE ADMINISTRACIÓN
+           SECCIÓN ADMIN
         ----------------------------------- */
         .seccion-admin {
-            background-color: var(--admin-bg);
-            border: 1px solid var(--admin-border);
+            background: linear-gradient(to bottom, #f1f5f9, #f8fafc);
+            border: 1px dashed #94a3b8;
             border-radius: var(--radius);
             padding: 20px;
-            margin-top: 24px;
         }
 
         .seccion-admin h4 {
             font-size: 0.95rem;
-            font-weight: 600;
-            margin-bottom: 6px;
+            font-weight: 700;
+            color: var(--text-title);
+            margin-bottom: 4px;
         }
 
         .seccion-admin p {
             font-size: 0.8rem;
             color: var(--text-muted);
-            margin-bottom: 12px;
+            margin-bottom: 16px;
         }
 
-        /* Estilos ajustados para FullCalendar */
+        /* ----------------------------------
+           FULLCALENDAR ESTILOS
+        ----------------------------------- */
         #calendar {
             font-size: 0.875rem;
         }
+        .fc {
+            --fc-border-color: var(--border);
+            --fc-button-bg-color: #ffffff;
+            --fc-button-border-color: var(--border);
+            --fc-button-text-color: var(--text-title);
+            --fc-button-hover-bg-color: #f1f5f9;
+            --fc-button-hover-border-color: var(--border);
+            --fc-button-active-bg-color: var(--primary);
+            --fc-button-active-border-color: var(--primary);
+            --fc-button-active-text-color: #ffffff;
+        }
         .fc .fc-toolbar-title {
             font-size: 1.1rem !important;
-            font-weight: 600;
+            font-weight: 700;
+            color: var(--text-title);
         }
-        .fc .fc-button-primary {
-            background-color: #fff !important;
-            border-color: var(--border) !important;
-            color: var(--text-primary) !important;
-            font-size: 0.85rem !important;
+        .fc .fc-button {
+            border-radius: 8px !important;
+            font-weight: 600 !important;
+            font-size: 0.8rem !important;
             box-shadow: none !important;
+            padding: 6px 12px !important;
         }
-        .fc .fc-button-primary:hover {
-            background-color: #f1f5f9 !important;
-        }
-        .fc .fc-button-active {
-            background-color: #e2e8f0 !important;
+        .fc-event {
+            border-radius: 6px !important;
+            background-color: var(--primary-light) !important;
+            border: 1px solid #c7d2fe !important;
+            color: var(--primary) !important;
+            padding: 2px 6px !important;
+            font-weight: 600 !important;
+            cursor: pointer;
         }
     </style>
 </head>
@@ -322,14 +422,20 @@
 <!-- PANTALLA 1: INICIO DE SESIÓN -->
 <div id="pantalla-login">
     <div class="login-card">
-        <h3>Acceso al Sistema</h3>
-        <div class="warning-box">
-            ⚠️ Ingresa con tu cuenta asignada para gestionar tu agenda.
+        <div class="login-brand">
+            <div class="brand-icon">📅</div>
+            <div>
+                <div style="font-weight: 700; font-size: 1.1rem; color: var(--text-title);">Agenda & Citas</div>
+                <div style="font-size: 0.75rem; color: var(--text-muted);">Plataforma de Gestión</div>
+            </div>
         </div>
-        
+
+        <h3>Iniciar Sesión</h3>
+        <p>Ingresa tus credenciales para acceder a la agenda.</p>
+
         <div class="form-group">
             <label for="input-usuario">Usuario</label>
-            <input type="text" id="input-usuario" placeholder="Nombre de usuario">
+            <input type="text" id="input-usuario" placeholder="Ej. usuario1">
         </div>
 
         <div class="form-group">
@@ -337,7 +443,7 @@
             <input type="password" id="input-contrasena" placeholder="••••••••">
         </div>
 
-        <button onclick="iniciarSesion()">Iniciar Sesión</button>
+        <button onclick="iniciarSesion()">Entrar al Sistema</button>
         <div id="error-login" class="error" style="display: none;"></div>
     </div>
 </div>
@@ -345,36 +451,45 @@
 <!-- PANTALLA 2: PANEL DE CONTROL -->
 <div id="pantalla-panel" class="oculto">
     
-    <!-- BARRA SUPERIOR -->
-    <header class="header-bar">
-        <div class="header-title">Sistema de Agenda & Citas</div>
-        <div class="header-user-info">
-            <span id="mensaje-bienvenida">Bienvenido</span>
-            <button onclick="cerrarSesion()" class="btn-danger" style="width: auto; padding: 6px 12px; font-size: 0.8rem;">Cerrar Sesión</button>
+    <!-- BARRA SUPERIOR (HEADER) -->
+    <header class="app-header">
+        <div class="header-logo">
+            <span style="font-size: 1.3rem;">📌</span>
+            <span>Sistema de Agenda</span>
+        </div>
+        <div class="user-menu">
+            <div class="user-badge">
+                <div class="user-avatar">👤</div>
+                <span id="mensaje-bienvenida">Cargando...</span>
+            </div>
+            <button onclick="cerrarSesion()" class="btn-danger" style="width: auto; padding: 7px 14px; font-size: 0.8rem;">
+                Cerrar Sesión
+            </button>
         </div>
     </header>
 
-    <!-- CONTENIDOR DASHBOARD -->
-    <div class="dashboard-container">
+    <!-- CONTENIDOR PRINCIPAL (DASHBOARD) -->
+    <div class="dashboard-layout">
         
-        <!-- COLUMNA IZQUIERDA: CALENDARIO Y LISTA -->
-        <main class="main-content">
+        <!-- COLUMNA PRINCIPAL (CALENDARIO Y LISTA) -->
+        <main class="main-area">
+            
             <!-- CALENDARIO -->
-            <div class="panel-card">
-                <div class="panel-title">
-                    <span>📅 Calendario de Actividades</span>
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">📅 Calendario Interactivo</div>
+                    <span style="font-size: 0.8rem; color: var(--text-muted);">Haz clic en un día para seleccionar fecha</span>
                 </div>
-                <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 12px;">
-                    Haz clic en una fecha para fijarla en el formulario de agendamiento.
-                </p>
                 <div id="calendar"></div>
             </div>
 
             <!-- LISTA DE CITAS -->
-            <div class="panel-card">
-                <div class="panel-title">
-                    <span>📋 Mis Citas Agendadas</span>
-                    <button onclick="cargarCitas()" class="btn-secondary" style="width: auto; padding: 4px 10px; font-size: 0.8rem;">🔄 Actualizar</button>
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">📋 Próximas Citas Agendadas</div>
+                    <button onclick="cargarCitas()" class="btn-secondary" style="width: auto; padding: 6px 12px; font-size: 0.8rem;">
+                        🔄 Actualizar Lista
+                    </button>
                 </div>
                 <ul id="lista-citas">
                     <!-- Citas cargadas dinámicamente -->
@@ -382,15 +497,18 @@
             </div>
         </main>
 
-        <!-- COLUMNA DERECHA: FORMULARIO Y ADMIN -->
-        <aside class="sidebar-content">
+        <!-- COLUMNA LATERAL (FORMULARIO Y ADMIN) -->
+        <aside class="sidebar-area">
+            
             <!-- AGENDAR CITA -->
-            <div class="panel-card">
-                <div class="panel-title">Agendar Nueva Cita</div>
-                
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">➕ Agendar Nueva Cita</div>
+                </div>
+
                 <div class="form-group">
-                    <label for="cita-titulo">Título de la cita</label>
-                    <input type="text" id="cita-titulo" placeholder="Ej. Reunión de avance">
+                    <label for="cita-titulo">Título de la Cita</label>
+                    <input type="text" id="cita-titulo" placeholder="Ej. Reunión de proyecto">
                 </div>
 
                 <div class="form-group">
@@ -399,29 +517,31 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="cita-detalles">Detalles adicionales</label>
-                    <input type="text" id="cita-detalles" placeholder="Notas sobre la actividad">
+                    <label for="cita-detalles">Detalles o Notas</label>
+                    <input type="text" id="cita-detalles" placeholder="Información relevante...">
                 </div>
 
-                <button onclick="crearNuevaCita()">Guardar Cita</button>
+                <button onclick="crearNuevaCita()">Agendar Actividad</button>
             </div>
 
-            <!-- PANEL DE ADMINISTRACIÓN (SOLO VISIBLE PARA ADMIN) -->
+            <!-- PANEL ADMINISTRADOR -->
             <div id="seccion-admin" class="seccion-admin oculto">
                 <h4>🛠️ Panel de Administración</h4>
-                <p>Crea cuentas para nuevos usuarios del sistema:</p>
-                
+                <p>Crea nuevos usuarios con acceso al sistema:</p>
+
                 <div class="form-group">
-                    <label for="admin-usuario">Nuevo usuario</label>
-                    <input type="text" id="admin-usuario" placeholder="Ej. jperez">
+                    <label for="admin-usuario">Nuevo Usuario</label>
+                    <input type="text" id="admin-usuario" placeholder="Ej. juan">
                 </div>
 
                 <div class="form-group">
-                    <label for="admin-contrasena">Contraseña temporal</label>
+                    <label for="admin-contrasena">Contraseña Inicial</label>
                     <input type="password" id="admin-contrasena" placeholder="••••••••">
                 </div>
 
-                <button onclick="crearUsuarioPorAdmin()" class="btn-secondary" style="background: #0f172a; color: #fff; border: none;">Crear Usuario</button>
+                <button onclick="crearUsuarioPorAdmin()" class="btn-secondary" style="background: #0f172a; color: white; border: none;">
+                    Crear Usuario
+                </button>
             </div>
         </aside>
     </div>
@@ -500,14 +620,16 @@
 
             document.getElementById("pantalla-login").classList.add("oculto");
             document.getElementById("pantalla-panel").classList.remove("oculto");
-            document.getElementById("mensaje-bienvenida").innerText = `${escapeHtml(miNombreUsuario)} (${miRol.toUpperCase()})`;
+            document.getElementById("mensaje-bienvenida").innerText = `${miNombreUsuario} (${miRol.toUpperCase()})`;
             
+            // Mostrar u ocultar Panel Admin
             if (miRol === 'admin') {
                 document.getElementById("seccion-admin").classList.remove("oculto");
             } else {
                 document.getElementById("seccion-admin").classList.add("oculto");
             }
 
+            // Inicializar y renderizar calendario
             setTimeout(() => {
                 inicializarCalendario();
                 cargarCitas();
@@ -583,6 +705,7 @@
 
         if (resultado.success && resultado.citas && resultado.citas.length > 0) {
             resultado.citas.forEach(cita => {
+                // Agregar evento al Calendario
                 if (calendar) {
                     calendar.addEvent({
                         id: cita.idCita,
@@ -592,25 +715,21 @@
                     });
                 }
 
+                // Agregar elemento a la Lista
                 const li = document.createElement("li");
                 
                 const titulo = document.createElement("strong");
                 titulo.textContent = cita.titulo;
                 
                 const fecha = document.createElement("span");
-                fecha.textContent = `📅 ${cita.fechaHora.replace("T", " a las ")} hrs`;
+                fecha.textContent = `⏰ ${cita.fechaHora.replace("T", " - ")} hrs`;
                 
                 const detalles = document.createElement("small");
-                detalles.textContent = cita.detalles ? `Nota: ${cita.detalles}` : "Sin detalles adicionales";
+                detalles.textContent = cita.detalles ? `Notas: ${cita.detalles}` : "Sin detalles adicionales";
                 
                 const btnEditar = document.createElement("button");
-                btnEditar.textContent = "✏️ Editar";
-                btnEditar.className = "btn-warning";
-                btnEditar.style.width = "auto";
-                btnEditar.style.padding = "4px 10px";
-                btnEditar.style.fontSize = "0.75rem";
-                btnEditar.style.marginTop = "6px";
-                btnEditar.style.alignSelf = "flex-start";
+                btnEditar.textContent = "✏️ Editar Cita";
+                btnEditar.className = "btn-edit";
                 btnEditar.onclick = () => editarMiCita(cita);
 
                 li.appendChild(titulo);
@@ -623,8 +742,8 @@
         } else {
             const li = document.createElement("li");
             li.textContent = "No hay citas agendadas actualmente.";
+            li.style.borderLeft = "4px solid #cbd5e1";
             li.style.color = "var(--text-muted)";
-            li.style.fontSize = "0.85rem";
             lista.appendChild(li);
         }
     }
@@ -675,7 +794,7 @@
 
         const resultado = await peticionBackend(datos);
         if (resultado.success) {
-            alert(`✅ Usuario '${nuevoUser}' creado con éxito.`);
+            alert(`✅ Usuario '${nuevoUser}' creado con éxito en Google Sheets.`);
             document.getElementById("admin-usuario").value = "";
             document.getElementById("admin-contrasena").value = "";
         } else {
