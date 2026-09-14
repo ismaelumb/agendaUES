@@ -620,7 +620,7 @@
 </div>
 
 <script>
-    var API_URL = "https://script.google.com/macros/s/AKfycbyj4vsDKMi57vR8vMgSDWcbkesq0kAMfZ9BAukjcH3kNYHW1Lc5Ii0Lirpge8d92iClZg/exec";
+    var API_URL = "https://script.google.com/macros/s/AKfycbyl6imOI8Agrk1bLQLWGvf5kUuC1c1Cili1jFkWs6ivWExm1mvPtTdYab-n_2XNF04djA/exec";
 
     // Estado de sesión — coincide con lo que regresa loginUsuario() en el backend:
     // { status:'success', usuario:{ id, nombre, email, rol, color } }
@@ -679,12 +679,30 @@
                 headers: { "Content-Type": "text/plain" }
             });
             var textoRespuesta = await response.text();
-            return JSON.parse(textoRespuesta);
+            try {
+                return JSON.parse(textoRespuesta);
+            } catch (parseError) {
+                // Si esto se dispara, casi siempre es porque la URL del
+                // Web App no está sirviendo la última versión del Code.gs
+                // (falta crear una "Nueva versión" en Implementar > Administrar
+                // implementaciones), o porque el deployment no es público.
+                console.error("Respuesta no era JSON válido:", textoRespuesta);
+                return { status: "error", message: "El servidor no respondió JSON válido. Revisa que el deployment de Apps Script esté en su última versión." };
+            }
         } catch (error) {
             console.error("Error backend:", error);
             return { status: "error", message: "Error de conexión: " + error.message };
         }
     }
+
+    // Prueba rápida de conectividad con el backend (útil para depurar
+    // problemas de deployment). Ábrela desde la consola: probarConexion()
+    async function probarConexion() {
+        var resultado = await peticionBackend({ accion: "ping" });
+        console.log("Resultado de ping:", resultado);
+        return resultado;
+    }
+    window.probarConexion = probarConexion;
 
     async function iniciarSesion() {
         var emailEl = document.getElementById("input-email");
@@ -796,16 +814,16 @@
         }
         if (!fin) fin = inicio;
 
-        // El backend (crearCita) espera un objeto anidado "cita".
+        // El backend deriva usuario/color del idUsuario (sesión real en el
+        // servidor); no hace falta ni conviene mandarlos desde el cliente.
         var datos = {
             accion: "crear_cita",
+            idUsuario: miIdUsuario,
             cita: {
                 titulo: titulo,
                 inicio: inicio,
                 fin: fin,
-                usuario: miNombreUsuario,
-                descripcion: detalles,
-                color: miColorUsuario
+                descripcion: detalles
             }
         };
 
@@ -823,11 +841,11 @@
     }
 
     async function cargarCitas() {
-        // El backend (obtenerCitas) filtra por nombre de usuario, salvo que el rol sea admin.
+        // El backend determina el rol real consultando la hoja "Usuarios"
+        // por idUsuario — no confía en un "rol" mandado desde el cliente.
         var datos = {
             accion: "obtener_citas",
-            usuario: miNombreUsuario,
-            rol: miRol
+            idUsuario: miIdUsuario
         };
 
         var resultado = await peticionBackend(datos);
@@ -974,17 +992,17 @@
 
         if (!nuevoTitulo.trim() || !nuevoInicio.trim()) return;
 
-        // El backend (editarCita) espera el objeto anidado "cita" con "id".
+        // El backend valida con idUsuario que seas el dueño de la cita (o admin)
+        // antes de permitir la edición.
         var datos = {
             accion: "editar_cita",
+            idUsuario: miIdUsuario,
             cita: {
                 id: cita.id,
                 titulo: nuevoTitulo.trim(),
                 inicio: nuevoInicio.trim(),
                 fin: (nuevoFin && nuevoFin.trim()) || nuevoInicio.trim(),
-                usuario: cita.usuario,
-                descripcion: nuevosDetalles ? nuevosDetalles.trim() : cita.descripcion,
-                color: cita.color
+                descripcion: nuevosDetalles ? nuevosDetalles.trim() : cita.descripcion
             }
         };
 
@@ -1002,6 +1020,7 @@
 
         var resultado = await peticionBackend({
             accion: "eliminar_cita",
+            idUsuario: miIdUsuario,
             id: idCita
         });
 
