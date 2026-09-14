@@ -9,137 +9,421 @@
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
 
     <style>
-        body { 
-            font-family: Arial, sans-serif; 
-            padding: 20px; 
-            background: #f4f7f6; 
+        :root {
+            --bg-body: #f8fafc;
+            --bg-surface: #ffffff;
+            --border: #e2e8f0;
+            --border-hover: #cbd5e1;
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --text-muted: #64748b;
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --danger: #dc2626;
+            --danger-hover: #b91c1c;
+            --admin-bg: #f1f5f9;
+            --admin-border: #94a3b8;
+            --radius: 6px;
+        }
+
+        * {
+            box-sizing: border-box;
             margin: 0;
+            padding: 0;
         }
-        .contenedor { 
-            max-width: 900px; 
-            margin: 0 auto; 
-            background: white; 
-            padding: 25px; 
-            border-radius: 8px; 
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1); 
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-primary);
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
         }
-        input, button { 
-            width: 100%; 
-            padding: 10px; 
-            margin: 6px 0; 
-            box-sizing: border-box; 
-            border: 1px solid #ccc;
-            border-radius: 4px;
+
+        .oculto {
+            display: none !important;
         }
-        button { 
-            background: #28a745; 
-            color: white; 
-            border: none; 
-            cursor: pointer; 
-            font-weight: bold; 
-            transition: background 0.2s;
+
+        /* ----------------------------------
+           PANTALLA LOGIN
+        ----------------------------------- */
+        #pantalla-login {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
         }
-        button:hover { 
-            background: #218838; 
+
+        .login-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            width: 100%;
+            max-width: 400px;
+            padding: 32px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
-        .oculto { 
-            display: none; 
+
+        .login-card h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-primary);
         }
-        .error { 
-            color: #dc3545; 
-            font-weight: bold; 
-        }
-        .warning { 
-            background: #fff3cd; 
-            padding: 10px; 
-            margin: 10px 0; 
-            border-radius: 4px; 
-            border-left: 4px solid #ffc107;
-        }
-        .seccion-admin {
-            background: #e9ecef;
-            padding: 15px;
-            border-radius: 6px;
-            margin-top: 25px;
-            border-left: 5px solid #17a2b8;
-        }
-        #calendar {
-            margin-top: 20px;
+
+        .warning-box {
+            background-color: #fefce8;
+            border: 1px solid #fef08a;
+            color: #854d0e;
+            padding: 12px;
+            border-radius: var(--radius);
+            font-size: 0.875rem;
             margin-bottom: 20px;
         }
-        ul { 
-            list-style: none; 
-            padding: 0; 
+
+        /* ----------------------------------
+           BARRA SUPERIOR (NAVBAR)
+        ----------------------------------- */
+        .header-bar {
+            background: var(--bg-surface);
+            border-bottom: 1px solid var(--border);
+            padding: 14px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
-        li { 
-            background: #f9f9f9; 
-            margin: 10px 0; 
-            padding: 12px; 
-            border-radius: 4px; 
-            border-left: 4px solid #007bff; 
+
+        .header-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .header-user-info {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        #mensaje-bienvenida {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        /* ----------------------------------
+           LAYOUT DASHBOARD (PANEL)
+        ----------------------------------- */
+        .dashboard-container {
+            max-width: 1200px;
+            margin: 24px auto;
+            padding: 0 24px;
+            display: grid;
+            grid-template-columns: 1fr 360px;
+            gap: 24px;
+        }
+
+        @media (max-width: 900px) {
+            .dashboard-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .panel-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px;
+            margin-bottom: 24px;
+        }
+
+        .panel-title {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 10px;
+        }
+
+        /* ----------------------------------
+           FORMULARIOS & INPUTS
+        ----------------------------------- */
+        .form-group {
+            margin-bottom: 14px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+        }
+
+        input[type="text"],
+        input[type="password"],
+        input[type="datetime-local"] {
+            width: 100%;
+            padding: 9px 12px;
+            font-size: 0.9rem;
+            background-color: #fff;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            color: var(--text-primary);
+            transition: border-color 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            padding: 9px 16px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #fff;
+            background-color: var(--primary);
+            border: 1px solid transparent;
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: background-color 0.15s ease;
+        }
+
+        button:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .btn-secondary {
+            background-color: #fff;
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background-color: #f8fafc;
+            border-color: var(--border-hover);
+        }
+
+        .btn-danger {
+            background-color: var(--danger);
+        }
+
+        .btn-danger:hover {
+            background-color: var(--danger-hover);
+        }
+
+        .btn-warning {
+            background-color: #f59e0b;
+            color: #fff;
+        }
+
+        .btn-warning:hover {
+            background-color: #d97706;
+        }
+
+        .error {
+            color: var(--danger);
+            font-size: 0.85rem;
+            margin-top: 8px;
+        }
+
+        /* ----------------------------------
+           LISTA DE CITAS
+        ----------------------------------- */
+        #lista-citas {
+            list-style: none;
+        }
+
+        #lista-citas li {
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 14px;
+            margin-bottom: 10px;
+            background-color: #fff;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        #lista-citas li strong {
+            font-size: 0.95rem;
+            color: var(--text-primary);
+        }
+
+        #lista-citas li span {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        #lista-citas li small {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+
+        /* ----------------------------------
+           PANEL DE ADMINISTRACIÓN
+        ----------------------------------- */
+        .seccion-admin {
+            background-color: var(--admin-bg);
+            border: 1px solid var(--admin-border);
+            border-radius: var(--radius);
+            padding: 20px;
+            margin-top: 24px;
+        }
+
+        .seccion-admin h4 {
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        .seccion-admin p {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+        }
+
+        /* Estilos ajustados para FullCalendar */
+        #calendar {
+            font-size: 0.875rem;
+        }
+        .fc .fc-toolbar-title {
+            font-size: 1.1rem !important;
+            font-weight: 600;
+        }
+        .fc .fc-button-primary {
+            background-color: #fff !important;
+            border-color: var(--border) !important;
+            color: var(--text-primary) !important;
+            font-size: 0.85rem !important;
+            box-shadow: none !important;
+        }
+        .fc .fc-button-primary:hover {
+            background-color: #f1f5f9 !important;
+        }
+        .fc .fc-button-active {
+            background-color: #e2e8f0 !important;
         }
     </style>
 </head>
 <body>
 
-<div class="contenedor">
-    <h1>Sistema de Agenda y Citas</h1>
-    
-    <!-- PANTALLA 1: INICIO DE SESIÓN -->
-    <div id="pantalla-login">
-        <h3>Iniciar Sesión</h3>
-        <div class="warning">
-            ⚠️ Este sistema requiere autenticación.<br>
-            Ingresa tus credenciales de usuario.
-        </div>
-        <input type="text" id="input-usuario" placeholder="Usuario">
-        <input type="password" id="input-contrasena" placeholder="Contraseña">
-        <button onclick="iniciarSesion()">Entrar</button>
-        <div id="error-login" class="error" style="display: none; margin-top: 10px;"></div>
-    </div>
-
-    <!-- PANTALLA 2: PANEL DE CONTROL -->
-    <div id="pantalla-panel" class="oculto">
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-            <h3 id="mensaje-bienvenida" style="margin: 0;">Bienvenido</h3>
-            <button onclick="cerrarSesion()" style="background: #dc3545; width: auto; padding: 8px 15px;">Cerrar Sesión</button>
+<!-- PANTALLA 1: INICIO DE SESIÓN -->
+<div id="pantalla-login">
+    <div class="login-card">
+        <h3>Acceso al Sistema</h3>
+        <div class="warning-box">
+            ⚠️ Ingresa con tu cuenta asignada para gestionar tu agenda.
         </div>
         
-        <hr>
-
-        <!-- 📅 CALENDARIO VISUAL -->
-        <h4>📅 Calendario de Actividades</h4>
-        <p style="font-size: 0.9em; color: #666;">
-            💡 Haz clic en cualquier día del calendario para seleccionar la fecha de agendamiento.
-        </p>
-        <div id="calendar"></div>
-
-        <hr>
-
-        <!-- 📝 FORMULARIO DE CREAR CITA -->
-        <h4>Agendar Nueva Cita</h4>
-        <input type="text" id="cita-titulo" placeholder="Título (Ej. Reunión de proyecto)">
-        <input type="datetime-local" id="cita-fecha">
-        <input type="text" id="cita-detalles" placeholder="Detalles de la actividad">
-        <button onclick="crearNuevaCita()">Agendar Actividad</button>
-
-        <hr>
-
-        <!-- 📋 LISTA DETALLADA DE CITAS -->
-        <h4>Mis Citas Agendadas</h4>
-        <button onclick="cargarCitas()" style="background: #007bff; margin-bottom: 10px;">🔄 Actualizar Calendario y Citas</button>
-        <ul id="lista-citas">
-            <!-- Citas cargadas dinámicamente -->
-        </ul>
-
-        <!-- 🛠️ SECCIÓN EXCLUSIVA DE ADMINISTRADOR -->
-        <div id="seccion-admin" class="seccion-admin oculto">
-            <h4>🛠️ Panel de Administración - Crear Usuarios</h4>
-            <p style="font-size: 0.9em; color: #555;">Crea cuentas para que otros usuarios accedan al sistema:</p>
-            <input type="text" id="admin-usuario" placeholder="Nombre de nuevo usuario">
-            <input type="password" id="admin-contrasena" placeholder="Contraseña inicial">
-            <button onclick="crearUsuarioPorAdmin()" style="background: #17a2b8;">Crear Nuevo Usuario</button>
+        <div class="form-group">
+            <label for="input-usuario">Usuario</label>
+            <input type="text" id="input-usuario" placeholder="Nombre de usuario">
         </div>
+
+        <div class="form-group">
+            <label for="input-contrasena">Contraseña</label>
+            <input type="password" id="input-contrasena" placeholder="••••••••">
+        </div>
+
+        <button onclick="iniciarSesion()">Iniciar Sesión</button>
+        <div id="error-login" class="error" style="display: none;"></div>
+    </div>
+</div>
+
+<!-- PANTALLA 2: PANEL DE CONTROL -->
+<div id="pantalla-panel" class="oculto">
+    
+    <!-- BARRA SUPERIOR -->
+    <header class="header-bar">
+        <div class="header-title">Sistema de Agenda & Citas</div>
+        <div class="header-user-info">
+            <span id="mensaje-bienvenida">Bienvenido</span>
+            <button onclick="cerrarSesion()" class="btn-danger" style="width: auto; padding: 6px 12px; font-size: 0.8rem;">Cerrar Sesión</button>
+        </div>
+    </header>
+
+    <!-- CONTENIDOR DASHBOARD -->
+    <div class="dashboard-container">
+        
+        <!-- COLUMNA IZQUIERDA: CALENDARIO Y LISTA -->
+        <main class="main-content">
+            <!-- CALENDARIO -->
+            <div class="panel-card">
+                <div class="panel-title">
+                    <span>📅 Calendario de Actividades</span>
+                </div>
+                <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 12px;">
+                    Haz clic en una fecha para fijarla en el formulario de agendamiento.
+                </p>
+                <div id="calendar"></div>
+            </div>
+
+            <!-- LISTA DE CITAS -->
+            <div class="panel-card">
+                <div class="panel-title">
+                    <span>📋 Mis Citas Agendadas</span>
+                    <button onclick="cargarCitas()" class="btn-secondary" style="width: auto; padding: 4px 10px; font-size: 0.8rem;">🔄 Actualizar</button>
+                </div>
+                <ul id="lista-citas">
+                    <!-- Citas cargadas dinámicamente -->
+                </ul>
+            </div>
+        </main>
+
+        <!-- COLUMNA DERECHA: FORMULARIO Y ADMIN -->
+        <aside class="sidebar-content">
+            <!-- AGENDAR CITA -->
+            <div class="panel-card">
+                <div class="panel-title">Agendar Nueva Cita</div>
+                
+                <div class="form-group">
+                    <label for="cita-titulo">Título de la cita</label>
+                    <input type="text" id="cita-titulo" placeholder="Ej. Reunión de avance">
+                </div>
+
+                <div class="form-group">
+                    <label for="cita-fecha">Fecha y Hora</label>
+                    <input type="datetime-local" id="cita-fecha">
+                </div>
+
+                <div class="form-group">
+                    <label for="cita-detalles">Detalles adicionales</label>
+                    <input type="text" id="cita-detalles" placeholder="Notas sobre la actividad">
+                </div>
+
+                <button onclick="crearNuevaCita()">Guardar Cita</button>
+            </div>
+
+            <!-- PANEL DE ADMINISTRACIÓN (SOLO VISIBLE PARA ADMIN) -->
+            <div id="seccion-admin" class="seccion-admin oculto">
+                <h4>🛠️ Panel de Administración</h4>
+                <p>Crea cuentas para nuevos usuarios del sistema:</p>
+                
+                <div class="form-group">
+                    <label for="admin-usuario">Nuevo usuario</label>
+                    <input type="text" id="admin-usuario" placeholder="Ej. jperez">
+                </div>
+
+                <div class="form-group">
+                    <label for="admin-contrasena">Contraseña temporal</label>
+                    <input type="password" id="admin-contrasena" placeholder="••••••••">
+                </div>
+
+                <button onclick="crearUsuarioPorAdmin()" class="btn-secondary" style="background: #0f172a; color: #fff; border: none;">Crear Usuario</button>
+            </div>
+        </aside>
     </div>
 </div>
 
@@ -163,9 +447,8 @@
                 right: 'dayGridMonth,timeGridWeek'
             },
             dateClick: function(info) {
-                // Al hacer clic en un día del calendario, pone esa fecha en el formulario
                 document.getElementById('cita-fecha').value = info.dateStr + "T09:00";
-                alert("📅 Fecha seleccionada: " + info.dateStr + "\nCompleta el título y haz clic en 'Agendar Actividad'.");
+                alert("📅 Fecha seleccionada: " + info.dateStr + "\nCompleta los datos en el formulario lateral.");
             },
             eventClick: function(info) {
                 alert("📌 Cita: " + info.event.title + "\n📝 Detalles: " + (info.event.extendedProps.detalles || "Sin detalles"));
@@ -217,16 +500,14 @@
 
             document.getElementById("pantalla-login").classList.add("oculto");
             document.getElementById("pantalla-panel").classList.remove("oculto");
-            document.getElementById("mensaje-bienvenida").innerText = `Hola, ${escapeHtml(miNombreUsuario)} (${miRol.toUpperCase()})`;
+            document.getElementById("mensaje-bienvenida").innerText = `${escapeHtml(miNombreUsuario)} (${miRol.toUpperCase()})`;
             
-            // Mostrar u ocultar Panel Admin
             if (miRol === 'admin') {
                 document.getElementById("seccion-admin").classList.remove("oculto");
             } else {
                 document.getElementById("seccion-admin").classList.add("oculto");
             }
 
-            // Inicializar y renderizar calendario
             setTimeout(() => {
                 inicializarCalendario();
                 cargarCitas();
@@ -302,7 +583,6 @@
 
         if (resultado.success && resultado.citas && resultado.citas.length > 0) {
             resultado.citas.forEach(cita => {
-                // Agregar evento al Calendario
                 if (calendar) {
                     calendar.addEvent({
                         id: cita.idCita,
@@ -312,27 +592,25 @@
                     });
                 }
 
-                // Agregar elemento a la Lista
                 const li = document.createElement("li");
                 
                 const titulo = document.createElement("strong");
                 titulo.textContent = cita.titulo;
                 
                 const fecha = document.createElement("span");
-                fecha.textContent = ` - ${cita.fechaHora.replace("T", " ")}`;
+                fecha.textContent = `📅 ${cita.fechaHora.replace("T", " a las ")} hrs`;
                 
                 const detalles = document.createElement("small");
-                detalles.style.display = "block";
-                detalles.style.marginTop = "4px";
-                detalles.style.color = "#555";
-                detalles.textContent = cita.detalles || "Sin detalles adicionales";
+                detalles.textContent = cita.detalles ? `Nota: ${cita.detalles}` : "Sin detalles adicionales";
                 
                 const btnEditar = document.createElement("button");
-                btnEditar.textContent = "✏️ Editar Cita";
-                btnEditar.style.background = "#ffc107";
-                btnEditar.style.color = "#000";
-                btnEditar.style.padding = "6px 10px";
-                btnEditar.style.marginTop = "8px";
+                btnEditar.textContent = "✏️ Editar";
+                btnEditar.className = "btn-warning";
+                btnEditar.style.width = "auto";
+                btnEditar.style.padding = "4px 10px";
+                btnEditar.style.fontSize = "0.75rem";
+                btnEditar.style.marginTop = "6px";
+                btnEditar.style.alignSelf = "flex-start";
                 btnEditar.onclick = () => editarMiCita(cita);
 
                 li.appendChild(titulo);
@@ -344,7 +622,9 @@
             });
         } else {
             const li = document.createElement("li");
-            li.textContent = "No hay citas agendadas.";
+            li.textContent = "No hay citas agendadas actualmente.";
+            li.style.color = "var(--text-muted)";
+            li.style.fontSize = "0.85rem";
             lista.appendChild(li);
         }
     }
@@ -395,7 +675,7 @@
 
         const resultado = await peticionBackend(datos);
         if (resultado.success) {
-            alert(`✅ Usuario '${nuevoUser}' creado con éxito en Google Sheets.`);
+            alert(`✅ Usuario '${nuevoUser}' creado con éxito.`);
             document.getElementById("admin-usuario").value = "";
             document.getElementById("admin-contrasena").value = "";
         } else {
