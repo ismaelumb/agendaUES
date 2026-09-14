@@ -47,9 +47,7 @@
             display: none !important;
         }
 
-        /* ----------------------------------
-           PANTALLA LOGIN
-        ----------------------------------- */
+        /* PANTALLA LOGIN */
         #pantalla-login {
             min-height: 100vh;
             display: flex;
@@ -102,9 +100,7 @@
             margin-bottom: 24px;
         }
 
-        /* ----------------------------------
-           HEADER NAVBAR
-        ----------------------------------- */
+        /* HEADER NAVBAR */
         .app-header {
             background: var(--surface);
             border-bottom: 1px solid var(--border);
@@ -157,9 +153,7 @@
             font-weight: 700;
         }
 
-        /* ----------------------------------
-           LAYOUT DASHBOARD
-        ----------------------------------- */
+        /* LAYOUT DASHBOARD */
         .dashboard-layout {
             max-width: 1280px;
             margin: 28px auto;
@@ -202,9 +196,7 @@
             gap: 8px;
         }
 
-        /* ----------------------------------
-           LEYENDA DE USUARIOS (COLOR CHIPS)
-        ----------------------------------- */
+        /* LEYENDA DE USUARIOS */
         .leyenda-container {
             display: flex;
             flex-wrap: wrap;
@@ -224,9 +216,7 @@
             box-shadow: var(--shadow-sm);
         }
 
-        /* ----------------------------------
-           FORMULARIOS & INPUTS
-        ----------------------------------- */
+        /* FORMULARIOS & INPUTS */
         .form-group {
             margin-bottom: 16px;
         }
@@ -332,9 +322,7 @@
             margin-top: 14px;
         }
 
-        /* ----------------------------------
-           LISTA DE CITAS
-        ----------------------------------- */
+        /* LISTA DE CITAS */
         #lista-citas {
             list-style: none;
             display: flex;
@@ -388,12 +376,10 @@
 
         #lista-citas li small {
             font-size: 0.85rem;
-            color: var(--text-secondary);
+            color: var(--text-body);
         }
 
-        /* ----------------------------------
-           SECCIÓN ADMIN
-        ----------------------------------- */
+        /* SECCIÓN ADMIN */
         .seccion-admin {
             background: linear-gradient(to bottom, #f1f5f9, #f8fafc);
             border: 1px dashed #94a3b8;
@@ -414,9 +400,7 @@
             margin-bottom: 16px;
         }
 
-        /* ----------------------------------
-           FULLCALENDAR ESTILOS
-        ----------------------------------- */
+        /* FULLCALENDAR */
         #calendar {
             font-size: 0.875rem;
         }
@@ -597,7 +581,7 @@
     let miNombreUsuario = "";
     let calendar;
 
-    // Paleta de colores atractivos para diferenciar cada usuario
+    // Paleta de colores para diferenciar cada usuario
     const PALETA_COLORES = [
         "#2563eb", // Azul
         "#059669", // Verde esmeralda
@@ -608,12 +592,11 @@
         "#ea580c", // Naranja brillante
         "#4f46e5", // Índigo
         "#ca8a04", // Amarillo oliva
-        "#be123c"  # Rojo carmesí
+        "#be123c"  // Rojo carmesí
     ];
     
     const mapaColoresUsuario = {};
 
-    // Asigna un color único y consistente a cada nombre de usuario
     function obtenerColorUsuario(nombreUsuario) {
         if (!nombreUsuario) return "#4f46e5";
         const key = nombreUsuario.toLowerCase().trim();
@@ -624,7 +607,7 @@
         return mapaColoresUsuario[key];
     }
 
-    // 1. Inicializar el Calendario Interactivo
+    // 1. Inicializar Calendario
     function inicializarCalendario() {
         const calendarEl = document.getElementById('calendar');
         calendar = new FullCalendar.Calendar(calendarEl, {
@@ -648,7 +631,7 @@
         calendar.render();
     }
 
-    // 2. Petición POST Genérica
+    // 2. Petición POST
     async function peticionBackend(datosPayload) {
         try {
             const response = await fetch(API_URL, {
@@ -693,7 +676,6 @@
             document.getElementById("pantalla-panel").classList.remove("oculto");
             document.getElementById("mensaje-bienvenida").innerText = `${miNombreUsuario} (${miRol.toUpperCase()})`;
             
-            // Mostrar u ocultar controles de Administrador
             if (miRol === 'admin') {
                 document.getElementById("seccion-admin").classList.remove("oculto");
                 document.getElementById("card-leyenda-admin").classList.remove("oculto");
@@ -702,7 +684,6 @@
                 document.getElementById("card-leyenda-admin").classList.add("oculto");
             }
 
-            // Inicializar y renderizar calendario
             setTimeout(() => {
                 inicializarCalendario();
                 cargarCitas();
@@ -761,7 +742,7 @@
         }
     }
 
-    // 6. Cargar Citas en Lista y Calendario con diferenciación por usuario
+    // 6. Cargar Citas
     async function cargarCitas() {
         const datos = {
             accion: "obtener_citas",
@@ -778,19 +759,14 @@
         }
 
         if (resultado.success && resultado.citas && resultado.citas.length > 0) {
-            
-            // Recorrer citas y dibujarlas
             resultado.citas.forEach(cita => {
-                // Identificar el usuario creador de la cita
                 const usuarioNombre = cita.usuario || cita.idUsuario || miNombreUsuario;
                 const colorUsuario = obtenerColorUsuario(usuarioNombre);
                 
-                // Formatear el texto que aparecerá (Para Admin: "usuario: título")
                 const tituloMostrar = (miRol === 'admin') 
                     ? `${usuarioNombre}: ${cita.titulo}` 
                     : cita.titulo;
 
-                // Agregar evento al Calendario visual
                 if (calendar) {
                     calendar.addEvent({
                         id: cita.idCita,
@@ -806,11 +782,9 @@
                     });
                 }
 
-                // Crear elemento en la Lista
                 const li = document.createElement("li");
                 li.style.borderLeft = `5px solid ${colorUsuario}`;
                 
-                // Badge de usuario (si es Admin)
                 if (miRol === 'admin') {
                     const headerUser = document.createElement("div");
                     headerUser.className = "cita-header-user";
@@ -847,7 +821,6 @@
                 lista.appendChild(li);
             });
 
-            // Actualizar Leyenda de Colores si es Administrador
             if (miRol === 'admin') {
                 actualizarLeyendaAdmin();
             }
@@ -861,7 +834,6 @@
         }
     }
 
-    // Muestra la leyenda de usuarios y sus colores asignados
     function actualizarLeyendaAdmin() {
         const contenedorLeyenda = document.getElementById("leyenda-usuarios");
         if (!contenedorLeyenda) return;
@@ -903,7 +875,7 @@
         }
     }
 
-    // 8. Crear Usuario por Administrador
+    // 8. Crear Usuario por Admin
     async function crearUsuarioPorAdmin() {
         const nuevoUser = document.getElementById("admin-usuario").value.trim();
         const nuevaPass = document.getElementById("admin-contrasena").value.trim();
@@ -929,12 +901,6 @@
         } else {
             alert(`❌ Error: ${resultado.mensaje || "No se pudo crear el usuario"}`);
         }
-    }
-
-    function escapeHtml(texto) {
-        const div = document.createElement("div");
-        div.textContent = texto;
-        return div.innerHTML;
     }
 </script>
 
