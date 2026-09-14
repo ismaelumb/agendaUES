@@ -463,7 +463,7 @@
             <input type="password" id="input-contrasena" placeholder="••••••••">
         </div>
 
-        <button onclick="iniciarSesion()">Entrar al Sistema</button>
+        <button type="button" onclick="iniciarSesion()">Entrar al Sistema</button>
         <div id="error-login" class="error" style="display: none;"></div>
     </div>
 </div>
@@ -482,7 +482,7 @@
                 <div class="user-avatar">👤</div>
                 <span id="mensaje-bienvenida">Cargando...</span>
             </div>
-            <button onclick="cerrarSesion()" class="btn-danger" style="width: auto; padding: 7px 14px; font-size: 0.8rem;">
+            <button type="button" onclick="cerrarSesion()" class="btn-danger" style="width: auto; padding: 7px 14px; font-size: 0.8rem;">
                 Cerrar Sesión
             </button>
         </div>
@@ -513,7 +513,7 @@
             <div class="card">
                 <div class="card-header">
                     <div class="card-title">📋 Próximas Citas Agendadas</div>
-                    <button onclick="cargarCitas()" class="btn-secondary" style="width: auto; padding: 6px 12px; font-size: 0.8rem;">
+                    <button type="button" onclick="cargarCitas()" class="btn-secondary" style="width: auto; padding: 6px 12px; font-size: 0.8rem;">
                         🔄 Actualizar Lista
                     </button>
                 </div>
@@ -547,7 +547,7 @@
                     <input type="text" id="cita-detalles" placeholder="Información relevante...">
                 </div>
 
-                <button onclick="crearNuevaCita()">Agendar Actividad</button>
+                <button type="button" onclick="crearNuevaCita()">Agendar Actividad</button>
             </div>
 
             <!-- PANEL ADMINISTRADOR -->
@@ -565,7 +565,7 @@
                     <input type="password" id="admin-contrasena" placeholder="••••••••">
                 </div>
 
-                <button onclick="crearUsuarioPorAdmin()" class="btn-secondary" style="background: #0f172a; color: white; border: none;">
+                <button type="button" onclick="crearUsuarioPorAdmin()" class="btn-secondary" style="background: #0f172a; color: white; border: none;">
                     Crear Usuario
                 </button>
             </div>
@@ -574,42 +574,41 @@
 </div>
 
 <script>
-    const API_URL = "https://script.google.com/macros/s/AKfycbzsVM181lTX4x-CG6w2BZaTGWu1aaywKD2msvnE5NDi3aCrtb_cBOH0XEYWCholBI1a5Q/exec";
+    var API_URL = "https://script.google.com/macros/s/AKfycbzsVM181lTX4x-CG6w2BZaTGWu1aaywKD2msvnE5NDi3aCrtb_cBOH0XEYWCholBI1a5Q/exec";
     
-    let miIdUsuario = "";
-    let miRol = "user";
-    let miNombreUsuario = "";
-    let calendar;
+    var miIdUsuario = "";
+    var miRol = "user";
+    var miNombreUsuario = "";
+    var calendar = null;
 
-    // Paleta de colores para diferenciar cada usuario
-    const PALETA_COLORES = [
-        "#2563eb", // Azul
-        "#059669", // Verde esmeralda
-        "#d97706", // Ámbar / Naranja
-        "#7c3aed", // Púrpura
-        "#db2777", // Rosa
-        "#0891b2", // Cían
-        "#ea580c", // Naranja brillante
-        "#4f46e5", // Índigo
-        "#ca8a04", // Amarillo oliva
-        "#be123c"  // Rojo carmesí
+    var PALETA_COLORES = [
+        "#2563eb",
+        "#059669",
+        "#d97706",
+        "#7c3aed",
+        "#db2777",
+        "#0891b2",
+        "#ea580c",
+        "#4f46e5",
+        "#ca8a04",
+        "#be123c"
     ];
     
-    const mapaColoresUsuario = {};
+    var mapaColoresUsuario = {};
 
     function obtenerColorUsuario(nombreUsuario) {
         if (!nombreUsuario) return "#4f46e5";
-        const key = nombreUsuario.toLowerCase().trim();
+        var key = nombreUsuario.toLowerCase().trim();
         if (!mapaColoresUsuario[key]) {
-            const totalRegistrados = Object.keys(mapaColoresUsuario).length;
+            var totalRegistrados = Object.keys(mapaColoresUsuario).length;
             mapaColoresUsuario[key] = PALETA_COLORES[totalRegistrados % PALETA_COLORES.length];
         }
         return mapaColoresUsuario[key];
     }
 
-    // 1. Inicializar Calendario
     function inicializarCalendario() {
-        const calendarEl = document.getElementById('calendar');
+        var calendarEl = document.getElementById('calendar');
+        if (!calendarEl) return;
         calendar = new FullCalendar.Calendar(calendarEl, {
             initialView: 'dayGridMonth',
             locale: 'es',
@@ -619,27 +618,28 @@
                 right: 'dayGridMonth,timeGridWeek'
             },
             dateClick: function(info) {
-                document.getElementById('cita-fecha').value = info.dateStr + "T09:00";
+                var elFecha = document.getElementById('cita-fecha');
+                if (elFecha) elFecha.value = info.dateStr + "T09:00";
                 alert("📅 Fecha seleccionada: " + info.dateStr + "\nCompleta los datos en el formulario lateral.");
             },
             eventClick: function(info) {
-                const u = info.event.extendedProps.usuario;
-                const msjUser = u ? ("👤 Usuario: " + u + "\n") : "";
-                alert("📌 Cita: " + info.event.title + "\n" + msjUser + "📝 Detalles: " + (info.event.extendedProps.detalles || "Sin detalles"));
+                var u = info.event.extendedProps ? info.event.extendedProps.usuario : "";
+                var msjUser = u ? ("👤 Usuario: " + u + "\n") : "";
+                var det = (info.event.extendedProps && info.event.extendedProps.detalles) ? info.event.extendedProps.detalles : "Sin detalles";
+                alert("📌 Cita: " + info.event.title + "\n" + msjUser + "📝 Detalles: " + det);
             }
         });
         calendar.render();
     }
 
-    // 2. Petición POST
     async function peticionBackend(datosPayload) {
         try {
-            const response = await fetch(API_URL, {
+            var response = await fetch(API_URL, {
                 method: "POST",
                 body: JSON.stringify(datosPayload),
                 headers: { "Content-Type": "text/plain" }
             });
-            const textoRespuesta = await response.text();
+            var textoRespuesta = await response.text();
             return JSON.parse(textoRespuesta);
         } catch (error) {
             console.error("Error backend:", error);
@@ -647,81 +647,107 @@
         }
     }
 
-    // 3. Inicio de Sesión
     async function iniciarSesion() {
-        const usuario = document.getElementById("input-usuario").value.trim();
-        const contrasena = document.getElementById("input-contrasena").value.trim();
-        const errorDiv = document.getElementById("error-login");
+        var usuarioEl = document.getElementById("input-usuario");
+        var contrasenaEl = document.getElementById("input-contrasena");
+        var errorDiv = document.getElementById("error-login");
 
-        errorDiv.style.display = "none";
+        if (!usuarioEl || !contrasenaEl) return;
+
+        var usuario = usuarioEl.value.trim();
+        var contrasena = contrasenaEl.value.trim();
+
+        if (errorDiv) errorDiv.style.display = "none";
 
         if (!usuario || !contrasena) {
-            errorDiv.textContent = "❌ Usuario y contraseña son obligatorios";
-            errorDiv.style.display = "block";
+            if (errorDiv) {
+                errorDiv.textContent = "❌ Usuario y contraseña son obligatorios";
+                errorDiv.style.display = "block";
+            }
             return;
         }
 
-        const resultado = await peticionBackend({
+        var resultado = await peticionBackend({
             accion: "login",
             usuario: usuario,
             contrasena: contrasena
         });
 
-        if (resultado.success) {
+        if (resultado && resultado.success) {
             miIdUsuario = resultado.idUsuario;
             miRol = resultado.rol || "user";
             miNombreUsuario = resultado.usuario;
 
-            document.getElementById("pantalla-login").classList.add("oculto");
-            document.getElementById("pantalla-panel").classList.remove("oculto");
-            document.getElementById("mensaje-bienvenida").innerText = `${miNombreUsuario} (${miRol.toUpperCase()})`;
+            var pantallaLogin = document.getElementById("pantalla-login");
+            var pantallaPanel = document.getElementById("pantalla-panel");
+            var msjBienvenida = document.getElementById("mensaje-bienvenida");
+
+            if (pantallaLogin) pantallaLogin.classList.add("oculto");
+            if (pantallaPanel) pantallaPanel.classList.remove("oculto");
+            if (msjBienvenida) msjBienvenida.innerText = miNombreUsuario + " (" + miRol.toUpperCase() + ")";
             
+            var secAdmin = document.getElementById("seccion-admin");
+            var cardLeyenda = document.getElementById("card-leyenda-admin");
+
             if (miRol === 'admin') {
-                document.getElementById("seccion-admin").classList.remove("oculto");
-                document.getElementById("card-leyenda-admin").classList.remove("oculto");
+                if (secAdmin) secAdmin.classList.remove("oculto");
+                if (cardLeyenda) cardLeyenda.classList.remove("oculto");
             } else {
-                document.getElementById("seccion-admin").classList.add("oculto");
-                document.getElementById("card-leyenda-admin").classList.add("oculto");
+                if (secAdmin) secAdmin.classList.add("oculto");
+                if (cardLeyenda) cardLeyenda.classList.add("oculto");
             }
 
-            setTimeout(() => {
+            setTimeout(function() {
                 inicializarCalendario();
                 cargarCitas();
             }, 200);
 
         } else {
-            errorDiv.textContent = `❌ ${resultado.mensaje || "Credenciales incorrectas"}`;
-            errorDiv.style.display = "block";
+            if (errorDiv) {
+                errorDiv.textContent = "❌ " + (resultado ? resultado.mensaje : "Credenciales incorrectas");
+                errorDiv.style.display = "block";
+            }
         }
     }
 
-    // 4. Cerrar Sesión
     function cerrarSesion() {
         miIdUsuario = "";
         miRol = "user";
 
-        document.getElementById("input-usuario").value = "";
-        document.getElementById("input-contrasena").value = "";
-        document.getElementById("cita-titulo").value = "";
-        document.getElementById("cita-fecha").value = "";
-        document.getElementById("cita-detalles").value = "";
+        var u = document.getElementById("input-usuario");
+        var p = document.getElementById("input-contrasena");
+        var t = document.getElementById("cita-titulo");
+        var f = document.getElementById("cita-fecha");
+        var d = document.getElementById("cita-detalles");
 
-        document.getElementById("pantalla-panel").classList.add("oculto");
-        document.getElementById("pantalla-login").classList.remove("oculto");
+        if (u) u.value = "";
+        if (p) p.value = "";
+        if (t) t.value = "";
+        if (f) f.value = "";
+        if (d) d.value = "";
+
+        var pantallaPanel = document.getElementById("pantalla-panel");
+        var pantallaLogin = document.getElementById("pantalla-login");
+
+        if (pantallaPanel) pantallaPanel.classList.add("oculto");
+        if (pantallaLogin) pantallaLogin.classList.remove("oculto");
     }
 
-    // 5. Crear Nueva Cita
     async function crearNuevaCita() {
-        const titulo = document.getElementById("cita-titulo").value.trim();
-        const fecha = document.getElementById("cita-fecha").value;
-        const detalles = document.getElementById("cita-detalles").value.trim();
+        var tEl = document.getElementById("cita-titulo");
+        var fEl = document.getElementById("cita-fecha");
+        var dEl = document.getElementById("cita-detalles");
+
+        var titulo = tEl ? tEl.value.trim() : "";
+        var fecha = fEl ? fEl.value : "";
+        var detalles = dEl ? dEl.value.trim() : "";
 
         if (!titulo || !fecha) {
             alert("❌ Título y Fecha son obligatorios");
             return;
         }
 
-        const datos = {
+        var datos = {
             accion: "crear_cita",
             idUsuario: miIdUsuario,
             usuario: miNombreUsuario,
@@ -730,41 +756,40 @@
             detalles: detalles
         };
 
-        const resultado = await peticionBackend(datos);
-        if (resultado.success) {
+        var resultado = await peticionBackend(datos);
+        if (resultado && resultado.success) {
             alert("✅ ¡Cita agendada con éxito!");
-            document.getElementById("cita-titulo").value = "";
-            document.getElementById("cita-fecha").value = "";
-            document.getElementById("cita-detalles").value = "";
+            if (tEl) tEl.value = "";
+            if (fEl) fEl.value = "";
+            if (dEl) dEl.value = "";
             cargarCitas();
         } else {
-            alert(`❌ Error: ${resultado.mensaje || "No se pudo crear la cita"}`);
+            alert("❌ Error: " + (resultado ? resultado.mensaje : "No se pudo crear la cita"));
         }
     }
 
-    // 6. Cargar Citas
     async function cargarCitas() {
-        const datos = {
+        var datos = {
             accion: "obtener_citas",
             idUsuario: miIdUsuario,
             rol: miRol
         };
 
-        const resultado = await peticionBackend(datos);
-        const lista = document.getElementById("lista-citas");
-        lista.innerHTML = "";
+        var resultado = await peticionBackend(datos);
+        var lista = document.getElementById("lista-citas");
+        if (lista) lista.innerHTML = "";
 
         if (calendar) {
             calendar.removeAllEvents();
         }
 
-        if (resultado.success && resultado.citas && resultado.citas.length > 0) {
-            resultado.citas.forEach(cita => {
-                const usuarioNombre = cita.usuario || cita.idUsuario || miNombreUsuario;
-                const colorUsuario = obtenerColorUsuario(usuarioNombre);
+        if (resultado && resultado.success && resultado.citas && resultado.citas.length > 0) {
+            resultado.citas.forEach(function(cita) {
+                var usuarioNombre = cita.usuario || cita.idUsuario || miNombreUsuario;
+                var colorUsuario = obtenerColorUsuario(usuarioNombre);
                 
-                const tituloMostrar = (miRol === 'admin') 
-                    ? `${usuarioNombre}: ${cita.titulo}` 
+                var tituloMostrar = (miRol === 'admin') 
+                    ? (usuarioNombre + ": " + cita.titulo) 
                     : cita.titulo;
 
                 if (calendar) {
@@ -782,51 +807,53 @@
                     });
                 }
 
-                const li = document.createElement("li");
-                li.style.borderLeft = `5px solid ${colorUsuario}`;
-                
-                if (miRol === 'admin') {
-                    const headerUser = document.createElement("div");
-                    headerUser.className = "cita-header-user";
+                if (lista) {
+                    var li = document.createElement("li");
+                    li.style.borderLeft = "5px solid " + colorUsuario;
+                    
+                    if (miRol === 'admin') {
+                        var headerUser = document.createElement("div");
+                        headerUser.className = "cita-header-user";
 
-                    const tagUser = document.createElement("span");
-                    tagUser.className = "tag-usuario";
-                    tagUser.style.backgroundColor = colorUsuario;
-                    tagUser.textContent = `👤 ${usuarioNombre}`;
+                        var tagUser = document.createElement("span");
+                        tagUser.className = "tag-usuario";
+                        tagUser.style.backgroundColor = colorUsuario;
+                        tagUser.textContent = "👤 " + usuarioNombre;
 
-                    headerUser.appendChild(tagUser);
-                    li.appendChild(headerUser);
+                        headerUser.appendChild(tagUser);
+                        li.appendChild(headerUser);
+                    }
+
+                    var titulo = document.createElement("strong");
+                    titulo.textContent = cita.titulo;
+                    
+                    var fecha = document.createElement("span");
+                    fecha.className = "fecha-texto";
+                    fecha.textContent = "⏰ " + (cita.fechaHora ? cita.fechaHora.replace("T", " - ") : "") + " hrs";
+                    
+                    var detalles = document.createElement("small");
+                    detalles.textContent = cita.detalles ? ("Notas: " + cita.detalles) : "Sin detalles adicionales";
+                    
+                    var btnEditar = document.createElement("button");
+                    btnEditar.textContent = "✏️ Editar Cita";
+                    btnEditar.className = "btn-edit";
+                    btnEditar.onclick = function() { editarMiCita(cita); };
+
+                    li.appendChild(titulo);
+                    li.appendChild(fecha);
+                    li.appendChild(detalles);
+                    li.appendChild(btnEditar);
+                    
+                    lista.appendChild(li);
                 }
-
-                const titulo = document.createElement("strong");
-                titulo.textContent = cita.titulo;
-                
-                const fecha = document.createElement("span");
-                fecha.className = "fecha-texto";
-                fecha.textContent = `⏰ ${cita.fechaHora.replace("T", " - ")} hrs`;
-                
-                const detalles = document.createElement("small");
-                detalles.textContent = cita.detalles ? `Notas: ${cita.detalles}` : "Sin detalles adicionales";
-                
-                const btnEditar = document.createElement("button");
-                btnEditar.textContent = "✏️ Editar Cita";
-                btnEditar.className = "btn-edit";
-                btnEditar.onclick = () => editarMiCita(cita);
-
-                li.appendChild(titulo);
-                li.appendChild(fecha);
-                li.appendChild(detalles);
-                li.appendChild(btnEditar);
-                
-                lista.appendChild(li);
             });
 
             if (miRol === 'admin') {
                 actualizarLeyendaAdmin();
             }
 
-        } else {
-            const li = document.createElement("li");
+        } else if (lista) {
+            var li = document.createElement("li");
             li.textContent = "No hay citas agendadas actualmente.";
             li.style.borderLeft = "4px solid #cbd5e1";
             li.style.color = "var(--text-muted)";
@@ -835,29 +862,28 @@
     }
 
     function actualizarLeyendaAdmin() {
-        const contenedorLeyenda = document.getElementById("leyenda-usuarios");
+        var contenedorLeyenda = document.getElementById("leyenda-usuarios");
         if (!contenedorLeyenda) return;
         contenedorLeyenda.innerHTML = "";
 
-        Object.keys(mapaColoresUsuario).forEach(userKey => {
-            const color = mapaColoresUsuario[userKey];
-            const chip = document.createElement("span");
+        Object.keys(mapaColoresUsuario).forEach(function(userKey) {
+            var color = mapaColoresUsuario[userKey];
+            var chip = document.createElement("span");
             chip.className = "leyenda-chip";
             chip.style.backgroundColor = color;
-            chip.textContent = `👤 ${userKey}`;
+            chip.textContent = "👤 " + userKey;
             contenedorLeyenda.appendChild(chip);
         });
     }
 
-    // 7. Editar Cita
     async function editarMiCita(cita) {
-        const nuevoTitulo = prompt("Escribe el nuevo título:", cita.titulo);
-        const nuevaFecha = prompt("Escribe la nueva fecha (Año-Mes-DíaTHora:Min):", cita.fechaHora);
-        const nuevosDetalles = prompt("Detalles adicionales:", cita.detalles || "");
+        var nuevoTitulo = prompt("Escribe el nuevo título:", cita.titulo);
+        var nuevaFecha = prompt("Escribe la nueva fecha (Año-Mes-DíaTHora:Min):", cita.fechaHora);
+        var nuevosDetalles = prompt("Detalles adicionales:", cita.detalles || "");
 
         if (!nuevoTitulo || !nuevaFecha) return;
 
-        const datos = {
+        var datos = {
             accion: "editar_cita",
             idCita: cita.idCita,
             idUsuario: miIdUsuario,
@@ -866,26 +892,28 @@
             detalles: nuevosDetalles ? nuevosDetalles.trim() : cita.detalles
         };
 
-        const resultado = await peticionBackend(datos);
-        if (resultado.success) {
+        var resultado = await peticionBackend(datos);
+        if (resultado && resultado.success) {
             alert("✅ Cita actualizada correctamente.");
             cargarCitas();
         } else {
-            alert(`❌ Error: ${resultado.mensaje || "No se pudo editar la cita"}`);
+            alert("❌ Error: " + (resultado ? resultado.mensaje : "No se pudo editar la cita"));
         }
     }
 
-    // 8. Crear Usuario por Admin
     async function crearUsuarioPorAdmin() {
-        const nuevoUser = document.getElementById("admin-usuario").value.trim();
-        const nuevaPass = document.getElementById("admin-contrasena").value.trim();
+        var uEl = document.getElementById("admin-usuario");
+        var pEl = document.getElementById("admin-contrasena");
+
+        var nuevoUser = uEl ? uEl.value.trim() : "";
+        var nuevaPass = pEl ? pEl.value.trim() : "";
 
         if (!nuevoUser || !nuevaPass) {
             alert("❌ Ingresa el nombre de usuario y contraseña");
             return;
         }
 
-        const datos = {
+        var datos = {
             accion: "crear_usuario",
             idUsuario: miIdUsuario,
             rolActual: miRol,
@@ -893,15 +921,23 @@
             nuevaContrasena: nuevaPass
         };
 
-        const resultado = await peticionBackend(datos);
-        if (resultado.success) {
-            alert(`✅ Usuario '${nuevoUser}' creado con éxito en Google Sheets.`);
-            document.getElementById("admin-usuario").value = "";
-            document.getElementById("admin-contrasena").value = "";
+        var resultado = await peticionBackend(datos);
+        if (resultado && resultado.success) {
+            alert("✅ Usuario '" + nuevoUser + "' creado con éxito en Google Sheets.");
+            if (uEl) uEl.value = "";
+            if (pEl) pEl.value = "";
         } else {
-            alert(`❌ Error: ${resultado.mensaje || "No se pudo crear el usuario"}`);
+            alert("❌ Error: " + (resultado ? resultado.mensaje : "No se pudo crear el usuario"));
         }
     }
+
+    // Registro explícito en el objeto global
+    window.iniciarSesion = iniciarSesion;
+    window.cerrarSesion = cerrarSesion;
+    window.crearNuevaCita = crearNuevaCita;
+    window.cargarCitas = cargarCitas;
+    window.crearUsuarioPorAdmin = crearUsuarioPorAdmin;
+    window.editarMiCita = editarMiCita;
 </script>
 
 </body>
