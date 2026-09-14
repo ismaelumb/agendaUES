@@ -1,4495 +1,1434 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
-
-    <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
-
-    <title>Sistema de Agenda y Citas</title>
-
-
-    <!-- =====================================================
-         FULLCALENDAR
-    ====================================================== -->
-
-    <link
-        rel="preconnect"
-        href="https://fonts.googleapis.com"
-    >
-
-    <link
-        rel="preconnect"
-        href="https://fonts.gstatic.com"
-        crossorigin
-    >
-
-    <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
-        rel="stylesheet"
-    >
-
-    <script
-        src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"
-    ></script>
-
-
-    <!-- =====================================================
-         ESTILOS
-    ====================================================== -->
-
-    <style>
-
-        :root {
-
-            --primary: #4f46e5;
-            --primary-hover: #4338ca;
-            --primary-light: #e0e7ff;
-
-            --bg-main: #f8fafc;
-
-            --surface: #ffffff;
-
-            --border: #e2e8f0;
-
-            --text-title: #0f172a;
-            --text-body: #334155;
-            --text-muted: #64748b;
-
-            --danger: #ef4444;
-            --danger-hover: #dc2626;
-
-            --success: #16a34a;
-
-            --shadow-sm:
-                0 1px 2px rgba(0,0,0,.05);
-
-            --shadow-md:
-                0 4px 12px rgba(0,0,0,.08);
-
-            --radius: 10px;
-        }
-
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-
-        body {
-
-            font-family:
-                'Inter',
-                -apple-system,
-                BlinkMacSystemFont,
-                sans-serif;
-
-            background:
-                var(--bg-main);
-
-            color:
-                var(--text-body);
-
-            line-height: 1.5;
-
-            -webkit-font-smoothing: antialiased;
-        }
-
-
-        .oculto {
-            display: none !important;
-        }
-
-
-        /* ==================================================
-           LOGIN
-        ================================================== */
-
-        #pantalla-login {
-
-            min-height: 100vh;
-
-            display: flex;
-
-            align-items: center;
-
-            justify-content: center;
-
-            padding: 24px;
-
-            background:
-                radial-gradient(
-                    circle at top left,
-                    #eef2ff,
-                    var(--bg-main)
-                );
-        }
-
-
-        .login-card {
-
-            width: 100%;
-
-            max-width: 420px;
-
-            padding: 40px 32px;
-
-            background:
-                var(--surface);
-
-            border:
-                1px solid var(--border);
-
-            border-radius:
-                16px;
-
-            box-shadow:
-                var(--shadow-md);
-        }
-
-
-        .login-brand {
-
-            display: flex;
-
-            align-items: center;
-
-            gap: 12px;
-
-            margin-bottom: 24px;
-        }
-
-
-        .brand-icon {
-
-            width: 44px;
-            height: 44px;
-
-            background:
-                var(--primary);
-
-            color: white;
-
-            border-radius:
-                11px;
-
-            display: flex;
-
-            align-items: center;
-
-            justify-content: center;
-
-            font-size: 21px;
-
-            box-shadow:
-                0 6px 14px rgba(79,70,229,.2);
-        }
-
-
-        .login-card h3 {
-
-            font-size:
-                1.45rem;
-
-            font-weight:
-                700;
-
-            color:
-                var(--text-title);
-
-            margin-bottom:
-                6px;
-        }
-
-
-        .login-card > p {
-
-            font-size:
-                .875rem;
-
-            color:
-                var(--text-muted);
-
-            margin-bottom:
-                24px;
-        }
-
-
-        /* ==================================================
-           HEADER
-        ================================================== */
-
-        .app-header {
-
-            background:
-                var(--surface);
-
-            border-bottom:
-                1px solid var(--border);
-
-            padding:
-                14px 32px;
-
-            display: flex;
-
-            justify-content:
-                space-between;
-
-            align-items:
-                center;
-
-            position:
-                sticky;
-
-            top: 0;
-
-            z-index: 50;
-        }
-
-
-        .header-logo {
-
-            display: flex;
-
-            align-items: center;
-
-            gap: 10px;
-
-            font-weight: 700;
-
-            font-size: 1.1rem;
-
-            color:
-                var(--text-title);
-        }
-
-
-        .user-menu {
-
-            display: flex;
-
-            align-items: center;
-
-            gap: 12px;
-        }
-
-
-        .user-badge {
-
-            display: flex;
-
-            align-items: center;
-
-            gap: 9px;
-
-            padding:
-                6px 12px;
-
-            background:
-                var(--bg-main);
-
-            border:
-                1px solid var(--border);
-
-            border-radius:
-                30px;
-
-            font-size:
-                .82rem;
-
-            font-weight:
-                600;
-        }
-
-
-        .user-avatar {
-
-            width: 28px;
-            height: 28px;
-
-            border-radius:
-                50%;
-
-            background:
-                var(--primary);
-
-            color:
-                white;
-
-            display: flex;
-
-            align-items: center;
-
-            justify-content: center;
-
-            font-size:
-                12px;
-        }
-
-
-        /* ==================================================
-           DASHBOARD
-        ================================================== */
-
-        .dashboard-layout {
-
-            max-width:
-                1320px;
-
-            margin:
-                28px auto;
-
-            padding:
-                0 24px;
-
-            display:
-                grid;
-
-            grid-template-columns:
-                minmax(0, 1fr) 380px;
-
-            gap:
-                28px;
-        }
-
-
-        @media (max-width: 992px) {
-
-            .dashboard-layout {
-
-                grid-template-columns:
-                    1fr;
-            }
-        }
-
-
-        @media (max-width: 600px) {
-
-            .dashboard-layout {
-
-                padding:
-                    0 12px;
-
-                margin-top:
-                    14px;
-            }
-
-            .app-header {
-
-                padding:
-                    12px 14px;
-            }
-
-            .user-badge {
-
-                display: none;
-            }
-        }
-
-
-        /* ==================================================
-           CARDS
-        ================================================== */
-
-        .card {
-
-            background:
-                var(--surface);
-
-            border:
-                1px solid var(--border);
-
-            border-radius:
-                var(--radius);
-
-            padding:
-                24px;
-
-            box-shadow:
-                var(--shadow-sm);
-
-            margin-bottom:
-                24px;
-        }
-
-
-        .card-header {
-
-            display: flex;
-
-            align-items: center;
-
-            justify-content:
-                space-between;
-
-            gap: 12px;
-
-            margin-bottom:
-                20px;
-
-            padding-bottom:
-                12px;
-
-            border-bottom:
-                1px solid var(--border);
-        }
-
-
-        .card-title {
-
-            font-size:
-                1.05rem;
-
-            font-weight:
-                600;
-
-            color:
-                var(--text-title);
-
-            display: flex;
-
-            align-items: center;
-
-            gap: 8px;
-        }
-
-
-        /* ==================================================
-           FORMULARIOS
-        ================================================== */
-
-        .form-group {
-
-            margin-bottom:
-                16px;
-        }
-
-
-        .form-group label {
-
-            display: block;
-
-            font-size:
-                .8rem;
-
-            font-weight:
-                600;
-
-            color:
-                var(--text-body);
-
-            margin-bottom:
-                6px;
-
-            text-transform:
-                uppercase;
-
-            letter-spacing:
-                .025em;
-        }
-
-
-        input,
-        select,
-        textarea {
-
-            width: 100%;
-
-            padding:
-                11px 13px;
-
-            font-size:
-                .9rem;
-
-            font-family:
-                inherit;
-
-            background:
-                var(--surface);
-
-            border:
-                1px solid var(--border);
-
-            border-radius:
-                8px;
-
-            color:
-                var(--text-title);
-
-            transition:
-                .2s;
-        }
-
-
-        textarea {
-
-            resize:
-                vertical;
-
-            min-height:
-                90px;
-        }
-
-
-        input:focus,
-        select:focus,
-        textarea:focus {
-
-            outline:
-                none;
-
-            border-color:
-                var(--primary);
-
-            box-shadow:
-                0 0 0 3px
-                rgba(79,70,229,.13);
-        }
-
-
-        .form-row {
-
-            display:
-                grid;
-
-            grid-template-columns:
-                1fr 1fr;
-
-            gap:
-                12px;
-        }
-
-
-        @media (max-width: 600px) {
-
-            .form-row {
-
-                grid-template-columns:
-                    1fr;
-            }
-        }
-
-
-        /* ==================================================
-           BOTONES
-        ================================================== */
-
-        button {
-
-            display:
-                inline-flex;
-
-            align-items:
-                center;
-
-            justify-content:
-                center;
-
-            gap:
-                8px;
-
-            width:
-                100%;
-
-            padding:
-                10px 18px;
-
-            font-size:
-                .88rem;
-
-            font-weight:
-                600;
-
-            font-family:
-                inherit;
-
-            color:
-                white;
-
-            background:
-                var(--primary);
-
-            border:
-                1px solid transparent;
-
-            border-radius:
-                8px;
-
-            cursor:
-                pointer;
-
-            transition:
-                .2s;
-
-            box-shadow:
-                var(--shadow-sm);
-        }
-
-
-        button:hover {
-
-            background:
-                var(--primary-hover);
-        }
-
-
-        button:disabled {
-
-            opacity:
-                .6;
-
-            cursor:
-                not-allowed;
-        }
-
-
-        .btn-secondary {
-
-            background:
-                white;
-
-            color:
-                var(--text-body);
-
-            border:
-                1px solid var(--border);
-        }
-
-
-        .btn-secondary:hover {
-
-            background:
-                var(--bg-main);
-        }
-
-
-        .btn-danger {
-
-            background:
-                #fee2e2;
-
-            color:
-                var(--danger);
-
-            border:
-                1px solid #fca5a5;
-
-            box-shadow:
-                none;
-        }
-
-
-        .btn-danger:hover {
-
-            background:
-                var(--danger);
-
-            color:
-                white;
-        }
-
-
-        .btn-edit {
-
-            width:
-                auto;
-
-            padding:
-                6px 11px;
-
-            font-size:
-                .76rem;
-
-            background:
-                #fef3c7;
-
-            color:
-                #92400e;
-
-            border:
-                1px solid #fde68a;
-
-            box-shadow:
-                none;
-        }
-
-
-        .btn-edit:hover {
-
-            background:
-                #fde68a;
-        }
-
-
-        .btn-delete {
-
-            width:
-                auto;
-
-            padding:
-                6px 11px;
-
-            font-size:
-                .76rem;
-
-            background:
-                #fee2e2;
-
-            color:
-                var(--danger);
-
-            border:
-                1px solid #fca5a5;
-
-            box-shadow:
-                none;
-        }
-
-
-        .btn-delete:hover {
-
-            background:
-                var(--danger);
-
-            color:
-                white;
-        }
-
-
-        .fila-botones {
-
-            display:
-                flex;
-
-            flex-wrap:
-                wrap;
-
-            gap:
-                8px;
-
-            margin-top:
-                4px;
-        }
-
-
-        /* ==================================================
-           MENSAJES
-        ================================================== */
-
-        .mensaje {
-
-            padding:
-                10px 12px;
-
-            border-radius:
-                8px;
-
-            font-size:
-                .83rem;
-
-            margin-top:
-                12px;
-        }
-
-
-        .mensaje.error {
-
-            background:
-                #fef2f2;
-
-            border:
-                1px solid #fecaca;
-
-            color:
-                #b91c1c;
-        }
-
-
-        .mensaje.exito {
-
-            background:
-                #f0fdf4;
-
-            border:
-                1px solid #bbf7d0;
-
-            color:
-                #166534;
-        }
-
-
-        /* ==================================================
-           LISTA DE CITAS
-        ================================================== */
-
-        #lista-citas {
-
-            list-style:
-                none;
-
-            display:
-                flex;
-
-            flex-direction:
-                column;
-
-            gap:
-                12px;
-        }
-
-
-        #lista-citas li {
-
-            border:
-                1px solid var(--border);
-
-            border-radius:
-                8px;
-
-            padding:
-                14px 16px;
-
-            background:
-                white;
-
-            display:
-                flex;
-
-            flex-direction:
-                column;
-
-            gap:
-                6px;
-
-            transition:
-                .15s;
-        }
-
-
-        #lista-citas li:hover {
-
-            transform:
-                translateY(-1px);
-
-            box-shadow:
-                var(--shadow-md);
-        }
-
-
-        #lista-citas strong {
-
-            font-size:
-                .95rem;
-
-            color:
-                var(--text-title);
-        }
-
-
-        .fecha-texto {
-
-            font-size:
-                .81rem;
-
-            color:
-                var(--text-muted);
-
-            font-weight:
-                500;
-        }
-
-
-        #lista-citas small {
-
-            font-size:
-                .83rem;
-
-            color:
-                var(--text-body);
-        }
-
-
-        .cita-header-user {
-
-            display:
-                flex;
-
-            align-items:
-                center;
-
-            gap:
-                8px;
-        }
-
-
-        .tag-usuario {
-
-            display:
-                inline-block;
-
-            padding:
-                3px 8px;
-
-            border-radius:
-                12px;
-
-            font-size:
-                .7rem;
-
-            font-weight:
-                700;
-
-            color:
-                white;
-
-            text-transform:
-                uppercase;
-        }
-
-
-        /* ==================================================
-           ADMIN
-        ================================================== */
-
-        .seccion-admin {
-
-            background:
-                linear-gradient(
-                    to bottom,
-                    #f1f5f9,
-                    #f8fafc
-                );
-
-            border:
-                1px dashed #94a3b8;
-
-            border-radius:
-                var(--radius);
-
-            padding:
-                20px;
-        }
-
-
-        .seccion-admin h4 {
-
-            font-size:
-                .95rem;
-
-            font-weight:
-                700;
-
-            color:
-                var(--text-title);
-
-            margin-bottom:
-                4px;
-        }
-
-
-        .seccion-admin p {
-
-            font-size:
-                .8rem;
-
-            color:
-                var(--text-muted);
-
-            margin-bottom:
-                16px;
-        }
-
-
-        /* ==================================================
-           LEYENDA
-        ================================================== */
-
-        .leyenda-container {
-
-            display:
-                flex;
-
-            flex-wrap:
-                wrap;
-
-            gap:
-                8px;
-
-            margin-top:
-                8px;
-        }
-
-
-        .leyenda-chip {
-
-            display:
-                inline-flex;
-
-            align-items:
-                center;
-
-            gap:
-                6px;
-
-            padding:
-                5px 10px;
-
-            border-radius:
-                20px;
-
-            font-size:
-                .75rem;
-
-            font-weight:
-                600;
-
-            color:
-                white;
-
-            box-shadow:
-                var(--shadow-sm);
-        }
-
-
-        /* ==================================================
-           FULLCALENDAR
-        ================================================== */
-
-        #calendar {
-
-            font-size:
-                .86rem;
-        }
-
-
-        .fc {
-
-            --fc-border-color:
-                var(--border);
-
-            --fc-button-bg-color:
-                #ffffff;
-
-            --fc-button-border-color:
-                var(--border);
-
-            --fc-button-text-color:
-                var(--text-title);
-
-            --fc-button-hover-bg-color:
-                #f1f5f9;
-
-            --fc-button-hover-border-color:
-                var(--border);
-
-            --fc-button-active-bg-color:
-                var(--primary);
-
-            --fc-button-active-border-color:
-                var(--primary);
-
-            --fc-button-active-text-color:
-                white;
-        }
-
-
-        .fc .fc-toolbar-title {
-
-            font-size:
-                1.1rem !important;
-
-            font-weight:
-                700;
-
-            color:
-                var(--text-title);
-        }
-
-
-        .fc .fc-button {
-
-            border-radius:
-                8px !important;
-
-            font-weight:
-                600 !important;
-
-            font-size:
-                .78rem !important;
-
-            box-shadow:
-                none !important;
-
-            padding:
-                6px 11px !important;
-        }
-
-
-        .fc-event {
-
-            border-radius:
-                6px !important;
-
-            padding:
-                3px 6px !important;
-
-            font-weight:
-                600 !important;
-
-            font-size:
-                .78rem !important;
-
-            cursor:
-                pointer;
-
-            border:
-                none !important;
-        }
-
-
-        /* ==================================================
-           MODAL
-        ================================================== */
-
-        .modal-overlay {
-
-            position:
-                fixed;
-
-            inset:
-                0;
-
-            background:
-                rgba(15,23,42,.5);
-
-            display:
-                flex;
-
-            align-items:
-                center;
-
-            justify-content:
-                center;
-
-            padding:
-                20px;
-
-            z-index:
-                1000;
-
-            backdrop-filter:
-                blur(3px);
-        }
-
-
-        .modal {
-
-            width:
-                100%;
-
-            max-width:
-                520px;
-
-            max-height:
-                90vh;
-
-            overflow-y:
-                auto;
-
-            background:
-                white;
-
-            border:
-                1px solid var(--border);
-
-            border-radius:
-                14px;
-
-            box-shadow:
-                0 20px 60px rgba(0,0,0,.2);
-
-            padding:
-                24px;
-        }
-
-
-        .modal-header {
-
-            display:
-                flex;
-
-            align-items:
-                center;
-
-            justify-content:
-                space-between;
-
-            gap:
-                12px;
-
-            margin-bottom:
-                20px;
-
-            padding-bottom:
-                12px;
-
-            border-bottom:
-                1px solid var(--border);
-        }
-
-
-        .modal-header h3 {
-
-            color:
-                var(--text-title);
-
-            font-size:
-                1.05rem;
-        }
-
-
-        .modal-close {
-
-            width:
-                34px;
-
-            height:
-                34px;
-
-            padding:
-                0;
-
-            background:
-                #f1f5f9;
-
-            color:
-                var(--text-body);
-
-            border:
-                1px solid var(--border);
-        }
-
-
-        .modal-close:hover {
-
-            background:
-                #e2e8f0;
-        }
-
-
-        .modal-actions {
-
-            display:
-                flex;
-
-            gap:
-                10px;
-
-            margin-top:
-                20px;
-        }
-
-
-        .modal-actions button {
-
-            flex:
-                1;
-        }
-
-
-        /* ==================================================
-           LOADING
-        ================================================== */
-
-        .loading-overlay {
-
-            position:
-                fixed;
-
-            inset:
-                0;
-
-            background:
-                rgba(255,255,255,.72);
-
-            display:
-                flex;
-
-            align-items:
-                center;
-
-            justify-content:
-                center;
-
-            z-index:
-                2000;
-
-            backdrop-filter:
-                blur(2px);
-        }
-
-
-        .loading-box {
-
-            background:
-                white;
-
-            border:
-                1px solid var(--border);
-
-            border-radius:
-                12px;
-
-            padding:
-                18px 24px;
-
-            box-shadow:
-                var(--shadow-md);
-
-            font-weight:
-                600;
-
-            color:
-                var(--text-title);
-        }
-
-
-    </style>
-
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sistema de Agenda y Citas</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
+
+<style>
+:root{
+  --primary:#4f46e5;
+  --primary-hover:#4338ca;
+  --bg:#f8fafc;
+  --surface:#fff;
+  --border:#e2e8f0;
+  --text:#334155;
+  --title:#0f172a;
+  --muted:#64748b;
+  --danger:#dc2626;
+  --success:#15803d;
+  --warning:#b45309;
+  --shadow:0 4px 15px rgba(15,23,42,.07);
+  --radius:12px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:Inter,Arial,sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  line-height:1.5;
+}
+.oculto{display:none!important}
+button,input,select{font:inherit}
+button{cursor:pointer}
+.login-screen{
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:24px;
+  background:radial-gradient(circle at top left,#eef2ff,var(--bg));
+}
+.login-card{
+  width:100%;
+  max-width:430px;
+  background:#fff;
+  border:1px solid var(--border);
+  border-radius:18px;
+  padding:38px 32px;
+  box-shadow:var(--shadow);
+}
+.brand{display:flex;gap:12px;align-items:center;margin-bottom:25px}
+.brand-icon{
+  width:44px;height:44px;border-radius:12px;background:var(--primary);
+  color:white;display:flex;align-items:center;justify-content:center;font-size:21px
+}
+.brand strong{display:block;color:var(--title)}
+.brand small{color:var(--muted)}
+h1,h2,h3,h4{color:var(--title)}
+.form-group{margin-bottom:15px}
+label{
+  display:block;font-size:.78rem;font-weight:700;color:var(--text);
+  margin-bottom:6px;text-transform:uppercase;letter-spacing:.02em
+}
+input,select{
+  width:100%;padding:10px 12px;border:1px solid var(--border);
+  border-radius:8px;background:white;color:var(--title);outline:none
+}
+input:focus,select:focus{
+  border-color:var(--primary);
+  box-shadow:0 0 0 3px rgba(79,70,229,.12)
+}
+button{
+  border:0;border-radius:8px;padding:10px 15px;
+  background:var(--primary);color:#fff;font-weight:700
+}
+button:hover{background:var(--primary-hover)}
+.btn-secondary{
+  background:#fff;color:var(--text);border:1px solid var(--border)
+}
+.btn-secondary:hover{background:#f1f5f9}
+.btn-danger{background:#fee2e2;color:var(--danger);border:1px solid #fecaca}
+.btn-danger:hover{background:var(--danger);color:#fff}
+.btn-warning{background:#fff7ed;color:var(--warning);border:1px solid #fed7aa}
+.btn-success{background:#dcfce7;color:var(--success);border:1px solid #bbf7d0}
+.btn-small{width:auto;padding:6px 9px;font-size:.75rem}
+.error,.mensaje{
+  margin-top:12px;padding:10px 12px;border-radius:8px;font-size:.85rem
+}
+.error{background:#fef2f2;border:1px solid #fecaca;color:var(--danger)}
+.mensaje{background:#f0fdf4;border:1px solid #bbf7d0;color:var(--success)}
+.app-header{
+  position:sticky;top:0;z-index:20;background:#fff;border-bottom:1px solid var(--border);
+  min-height:66px;padding:12px 28px;display:flex;justify-content:space-between;align-items:center
+}
+.logo{font-weight:800;color:var(--title);display:flex;gap:9px;align-items:center}
+.user-menu{display:flex;align-items:center;gap:10px}
+.user-badge{
+  padding:7px 12px;background:#f8fafc;border:1px solid var(--border);
+  border-radius:30px;font-size:.82rem;font-weight:600
+}
+.dashboard{
+  max-width:1400px;margin:24px auto;padding:0 20px;
+  display:grid;grid-template-columns:minmax(0,1fr) 390px;gap:22px
+}
+.card{
+  background:#fff;border:1px solid var(--border);border-radius:var(--radius);
+  padding:20px;box-shadow:0 1px 2px rgba(0,0,0,.03);margin-bottom:20px
+}
+.card-header{
+  display:flex;justify-content:space-between;align-items:center;gap:12px;
+  padding-bottom:13px;margin-bottom:17px;border-bottom:1px solid var(--border)
+}
+.card-title{font-weight:800;color:var(--title)}
+.admin-box{
+  background:linear-gradient(180deg,#f8fafc,#fff);
+  border:1px dashed #94a3b8;border-radius:12px;padding:18px
+}
+.admin-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:15px}
+.admin-tab{
+  width:auto;padding:8px 11px;background:#fff;color:var(--text);
+  border:1px solid var(--border);font-size:.78rem
+}
+.admin-tab.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.legend{display:flex;gap:7px;flex-wrap:wrap}
+.chip{
+  color:#fff;border-radius:20px;padding:4px 9px;font-size:.72rem;font-weight:700
+}
+.list{list-style:none;display:flex;flex-direction:column;gap:10px}
+.list li{
+  border:1px solid var(--border);border-left:5px solid var(--primary);
+  border-radius:9px;padding:12px;background:#fff
+}
+.list-title{font-weight:800;color:var(--title)}
+.list-date{font-size:.8rem;color:var(--muted);margin:4px 0}
+.list-notes{font-size:.82rem}
+.actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:9px}
+.table-wrap{overflow:auto;border:1px solid var(--border);border-radius:9px}
+table{width:100%;border-collapse:collapse;font-size:.76rem;min-width:700px}
+th,td{padding:9px;border-bottom:1px solid var(--border);text-align:left;vertical-align:middle}
+th{background:#f8fafc;color:var(--title);font-size:.7rem;text-transform:uppercase}
+.status{
+  display:inline-block;border-radius:15px;padding:3px 8px;font-weight:800;font-size:.68rem
+}
+.status.activo{background:#dcfce7;color:#166534}
+.status.inactivo{background:#fee2e2;color:#991b1b}
+.role{font-weight:800}
+.fc .fc-toolbar-title{font-size:1.05rem}
+.fc .fc-button{border-radius:7px!important;font-size:.78rem!important}
+.modal-bg{
+  position:fixed;inset:0;background:rgba(15,23,42,.48);z-index:100;
+  display:flex;align-items:center;justify-content:center;padding:20px
+}
+.modal{
+  width:100%;max-width:560px;background:#fff;border-radius:14px;
+  padding:22px;box-shadow:0 20px 50px rgba(0,0,0,.2)
+}
+.modal-header{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:16px}
+.close{width:auto;background:#f1f5f9;color:var(--text);padding:5px 9px}
+.close:hover{background:#e2e8f0}
+.small{font-size:.75rem;color:var(--muted)}
+@media(max-width:1050px){.dashboard{grid-template-columns:1fr}}
+@media(max-width:650px){
+  .app-header{padding:11px 14px}.dashboard{padding:0 12px}
+  .user-badge{display:none}.form-row{grid-template-columns:1fr}
+  .card{padding:15px}
+}
+</style>
 </head>
-
 
 <body>
 
-
-<!-- ========================================================
-     LOADING
-========================================================= -->
-
-<div
-    id="loading-overlay"
-    class="loading-overlay oculto"
->
-
-    <div class="loading-box">
-        ⏳ Procesando...
+<!-- ========================= LOGIN ========================= -->
+<section id="pantalla-login" class="login-screen">
+  <div class="login-card">
+    <div class="brand">
+      <div class="brand-icon">📅</div>
+      <div>
+        <strong>Agenda & Citas</strong>
+        <small>Plataforma de Gestión</small>
+      </div>
     </div>
 
-</div>
+    <h2>Iniciar sesión</h2>
+    <p class="small" style="margin:5px 0 22px">
+      Ingresa con tu correo o usuario.
+    </p>
 
-
-<!-- ========================================================
-     LOGIN
-========================================================= -->
-
-<div id="pantalla-login">
-
-    <div class="login-card">
-
-        <div class="login-brand">
-
-            <div class="brand-icon">
-                📅
-            </div>
-
-            <div>
-
-                <div
-                    style="
-                        font-weight:700;
-                        font-size:1.1rem;
-                        color:var(--text-title);
-                    "
-                >
-                    Agenda & Citas
-                </div>
-
-                <div
-                    style="
-                        font-size:.75rem;
-                        color:var(--text-muted);
-                    "
-                >
-                    Plataforma de Gestión
-                </div>
-
-            </div>
-
-        </div>
-
-
-        <h3>
-            Iniciar Sesión
-        </h3>
-
-        <p>
-            Ingresa tu usuario y contraseña para acceder a la agenda.
-        </p>
-
-
-        <form
-            id="form-login"
-            onsubmit="event.preventDefault(); iniciarSesion();"
-        >
-
-            <div class="form-group">
-
-                <label for="input-usuario">
-                    Usuario
-                </label>
-
-                <input
-                    type="text"
-                    id="input-usuario"
-                    placeholder="Ej. admin"
-                    autocomplete="username"
-                    required
-                >
-
-            </div>
-
-
-            <div class="form-group">
-
-                <label for="input-contrasena">
-                    Contraseña
-                </label>
-
-                <input
-                    type="password"
-                    id="input-contrasena"
-                    placeholder="••••••••"
-                    autocomplete="current-password"
-                    required
-                >
-
-            </div>
-
-
-            <button
-                type="submit"
-                id="btn-login"
-            >
-                🔐 Entrar al Sistema
-            </button>
-
-        </form>
-
-
-        <div
-            id="error-login"
-            class="mensaje error oculto"
-        ></div>
-
+    <div class="form-group">
+      <label for="input-email">Correo o usuario</label>
+      <input id="input-email" type="text" autocomplete="username"
+             placeholder="usuario o correo@dominio.com">
     </div>
 
-</div>
-
-
-<!-- ========================================================
-     PANEL PRINCIPAL
-========================================================= -->
-
-<div
-    id="pantalla-panel"
-    class="oculto"
->
-
-
-    <!-- ====================================================
-         HEADER
-    ===================================================== -->
-
-    <header class="app-header">
-
-        <div class="header-logo">
-
-            <span style="font-size:1.3rem;">
-                📌
-            </span>
-
-            <span>
-                Sistema de Agenda
-            </span>
-
-        </div>
-
-
-        <div class="user-menu">
-
-            <div class="user-badge">
-
-                <div
-                    id="usuario-avatar"
-                    class="user-avatar"
-                >
-                    👤
-                </div>
-
-                <span id="mensaje-bienvenida">
-                    Cargando...
-                </span>
-
-            </div>
-
-
-            <button
-                type="button"
-                onclick="cerrarSesion()"
-                class="btn-danger"
-                style="
-                    width:auto;
-                    padding:7px 14px;
-                    font-size:.8rem;
-                "
-            >
-                🚪 Salir
-            </button>
-
-        </div>
-
-    </header>
-
-
-    <!-- ====================================================
-         DASHBOARD
-    ===================================================== -->
-
-    <div class="dashboard-layout">
-
-
-        <!-- ==================================================
-             COLUMNA PRINCIPAL
-        =================================================== -->
-
-        <main class="main-area">
-
-
-            <!-- =================================================
-                 LEYENDA ADMIN
-            ================================================== -->
-
-            <div
-                id="card-leyenda-admin"
-                class="card oculto"
-                style="padding:16px 24px;"
-            >
-
-                <div
-                    class="card-title"
-                    style="
-                        font-size:.875rem;
-                        margin-bottom:8px;
-                    "
-                >
-                    🎨 Usuarios y colores
-                </div>
-
-                <div
-                    id="leyenda-usuarios"
-                    class="leyenda-container"
-                ></div>
-
-            </div>
-
-
-            <!-- =================================================
-                 CALENDARIO
-            ================================================== -->
-
-            <div class="card">
-
-                <div class="card-header">
-
-                    <div class="card-title">
-                        📅 Calendario Interactivo
-                    </div>
-
-                    <span
-                        style="
-                            font-size:.78rem;
-                            color:var(--text-muted);
-                        "
-                    >
-                        Haz clic en una fecha para agendar
-                    </span>
-
-                </div>
-
-
-                <div id="calendar"></div>
-
-            </div>
-
-
-            <!-- =================================================
-                 LISTA
-            ================================================== -->
-
-            <div class="card">
-
-                <div class="card-header">
-
-                    <div class="card-title">
-                        📋 Citas Agendadas
-                    </div>
-
-
-                    <button
-                        type="button"
-                        onclick="cargarCitas()"
-                        class="btn-secondary"
-                        style="
-                            width:auto;
-                            padding:6px 12px;
-                            font-size:.78rem;
-                        "
-                    >
-                        🔄 Actualizar
-                    </button>
-
-                </div>
-
-
-                <ul id="lista-citas"></ul>
-
-            </div>
-
-        </main>
-
-
-        <!-- ==================================================
-             SIDEBAR
-        =================================================== -->
-
-        <aside class="sidebar-area">
-
-
-            <!-- =================================================
-                 NUEVA CITA
-            ================================================== -->
-
-            <div class="card">
-
-                <div class="card-header">
-
-                    <div class="card-title">
-                        ➕ Nueva Cita
-                    </div>
-
-                </div>
-
-
-                <div class="form-group">
-
-                    <label for="cita-titulo">
-                        Título
-                    </label>
-
-                    <input
-                        type="text"
-                        id="cita-titulo"
-                        placeholder="Ej. Reunión de proyecto"
-                    >
-
-                </div>
-
-
-                <div class="form-group">
-
-                    <label for="cita-inicio">
-                        Inicio
-                    </label>
-
-                    <input
-                        type="datetime-local"
-                        id="cita-inicio"
-                        onchange="autocompletarFin()"
-                    >
-
-                </div>
-
-
-                <div class="form-group">
-
-                    <label for="cita-fin">
-                        Fin
-                    </label>
-
-                    <input
-                        type="datetime-local"
-                        id="cita-fin"
-                    >
-
-                </div>
-
-
-                <div class="form-group">
-
-                    <label for="cita-detalles">
-                        Detalles / Notas
-                    </label>
-
-                    <textarea
-                        id="cita-detalles"
-                        placeholder="Información relevante..."
-                    ></textarea>
-
-                </div>
-
-
-                <button
-                    type="button"
-                    onclick="crearNuevaCita()"
-                >
-                    📅 Agendar Actividad
-                </button>
-
-
-                <div
-                    id="mensaje-cita"
-                    class="mensaje oculto"
-                ></div>
-
-            </div>
-
-
-            <!-- =================================================
-                 ADMINISTRACIÓN
-            ================================================== -->
-
-            <div
-                id="seccion-admin"
-                class="seccion-admin oculto"
-            >
-
-                <h4>
-                    🛠️ Panel de Administración
-                </h4>
-
-                <p>
-                    Crear nuevos usuarios con acceso al sistema.
-                </p>
-
-
-                <div class="form-group">
-
-                    <label for="admin-usuario">
-                        Usuario
-                    </label>
-
-                    <input
-                        type="text"
-                        id="admin-usuario"
-                        placeholder="Ej. juanperez"
-                    >
-
-                </div>
-
-
-                <div class="form-group">
-
-                    <label for="admin-nombre">
-                        Nombre
-                    </label>
-
-                    <input
-                        type="text"
-                        id="admin-nombre"
-                        placeholder="Ej. Juan Pérez"
-                    >
-
-                </div>
-
-
-                <div class="form-group">
-
-                    <label for="admin-contrasena">
-                        Contraseña Inicial
-                    </label>
-
-                    <input
-                        type="password"
-                        id="admin-contrasena"
-                        placeholder="••••••••"
-                    >
-
-                </div>
-
-
-                <div class="form-group">
-
-                    <label for="admin-rol">
-                        Rol
-                    </label>
-
-                    <select id="admin-rol">
-
-                        <option value="user">
-                            Usuario
-                        </option>
-
-                        <option value="admin">
-                            Administrador
-                        </option>
-
-                    </select>
-
-                </div>
-
-
-                <button
-                    type="button"
-                    onclick="crearUsuarioPorAdmin()"
-                    style="
-                        background:#0f172a;
-                    "
-                >
-                    👤 Crear Usuario
-                </button>
-
-
-                <div
-                    id="mensaje-admin"
-                    class="mensaje oculto"
-                ></div>
-
-            </div>
-
-        </aside>
-
+    <div class="form-group">
+      <label for="input-contrasena">Contraseña</label>
+      <input id="input-contrasena" type="password" autocomplete="current-password"
+             placeholder="••••••••"
+             onkeydown="if(event.key==='Enter') iniciarSesion()">
     </div>
 
-</div>
+    <button type="button" onclick="iniciarSesion()">Entrar al sistema</button>
+    <div id="error-login" class="error oculto"></div>
+  </div>
+</section>
 
+<!-- ========================= PANEL ========================= -->
+<section id="pantalla-panel" class="oculto">
 
-<!-- ========================================================
-     MODAL EDITAR CITA
-========================================================= -->
+<header class="app-header">
+  <div class="logo">📌 <span>Sistema de Agenda</span></div>
 
-<div
-    id="modal-editar"
-    class="modal-overlay oculto"
->
+  <div class="user-menu">
+    <div class="user-badge" id="mensaje-bienvenida">Cargando...</div>
+    <button type="button" class="btn-danger btn-small" onclick="cerrarSesion()">
+      Cerrar sesión
+    </button>
+  </div>
+</header>
 
-    <div class="modal">
+<div class="dashboard">
 
-        <div class="modal-header">
+  <!-- ================= COLUMNA PRINCIPAL ================= -->
+  <main>
 
-            <h3>
-                ✏️ Editar Cita
-            </h3>
+    <div id="card-leyenda-admin" class="card oculto">
+      <div class="card-header">
+        <div class="card-title">🎨 Usuarios y colores</div>
+      </div>
+      <div id="leyenda-usuarios" class="legend"></div>
+    </div>
 
-            <button
-                type="button"
-                class="modal-close"
-                onclick="cerrarModalEditar()"
-            >
-                ✕
-            </button>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">📅 Calendario</div>
+        <button class="btn-secondary btn-small" onclick="cargarCitas()">
+          🔄 Actualizar
+        </button>
+      </div>
+      <div id="calendar"></div>
+    </div>
 
-        </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">📋 Próximas citas</div>
+      </div>
+      <ul id="lista-citas" class="list"></ul>
+    </div>
 
+  </main>
 
-        <input
-            type="hidden"
-            id="editar-id"
-        >
+  <!-- ================= COLUMNA LATERAL ================= -->
+  <aside>
 
+    <!-- NUEVA CITA -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">➕ Agendar cita</div>
+      </div>
+
+      <div class="form-group">
+        <label for="cita-titulo">Título</label>
+        <input id="cita-titulo" type="text" placeholder="Ej. Reunión de proyecto">
+      </div>
+
+      <div class="form-group">
+        <label for="cita-inicio">Inicio</label>
+        <input id="cita-inicio" type="datetime-local" onchange="autocompletarFin()">
+      </div>
+
+      <div class="form-group">
+        <label for="cita-fin">Fin</label>
+        <input id="cita-fin" type="datetime-local">
+      </div>
+
+      <div class="form-group">
+        <label for="cita-detalles">Detalles / notas</label>
+        <input id="cita-detalles" type="text" placeholder="Información relevante">
+      </div>
+
+      <button onclick="crearNuevaCita()">Agendar actividad</button>
+      <div id="mensaje-cita" class="mensaje oculto"></div>
+    </div>
+
+    <!-- CAMBIAR MI PASSWORD -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">🔐 Mi contraseña</div>
+      </div>
+
+      <div class="form-group">
+        <label for="mi-password-actual">Contraseña actual</label>
+        <input id="mi-password-actual" type="password">
+      </div>
+
+      <div class="form-group">
+        <label for="mi-password-nueva">Nueva contraseña</label>
+        <input id="mi-password-nueva" type="password" placeholder="Mínimo 6 caracteres">
+      </div>
+
+      <button class="btn-secondary" onclick="cambiarMiPassword()">Cambiar contraseña</button>
+      <div id="mensaje-password" class="mensaje oculto"></div>
+    </div>
+
+    <!-- ================= ADMIN ================= -->
+    <div id="seccion-admin" class="admin-box oculto">
+
+      <h3 style="font-size:1rem">🛠️ Panel de administración</h3>
+      <p class="small" style="margin:4px 0 15px">
+        Administración de usuarios, contraseñas y bitácora.
+      </p>
+
+      <div class="admin-tabs">
+        <button id="tab-btn-crear" class="admin-tab active" onclick="mostrarTabAdmin('crear')">
+          ➕ Crear
+        </button>
+        <button id="tab-btn-usuarios" class="admin-tab" onclick="mostrarTabAdmin('usuarios')">
+          👥 Usuarios
+        </button>
+        <button id="tab-btn-bitacora" class="admin-tab" onclick="mostrarTabAdmin('bitacora')">
+          📜 Bitácora
+        </button>
+      </div>
+
+      <!-- TAB CREAR -->
+      <div id="admin-tab-crear">
 
         <div class="form-group">
-
-            <label for="editar-titulo">
-                Título
-            </label>
-
-            <input
-                type="text"
-                id="editar-titulo"
-            >
-
+          <label for="admin-nombre">Nombre completo</label>
+          <input id="admin-nombre" type="text" placeholder="Ej. Juan Pérez">
         </div>
 
+        <div class="form-group">
+          <label for="admin-email">Correo electrónico</label>
+          <input id="admin-email" type="email" placeholder="Ej. juan@correo.com">
+        </div>
+
+        <div class="form-group">
+          <label for="admin-contrasena">Contraseña inicial</label>
+          <input id="admin-contrasena" type="password" placeholder="Mínimo 6 caracteres">
+        </div>
+
+        <div class="form-group">
+          <label for="admin-rol">Rol</label>
+          <select id="admin-rol">
+            <option value="user">Usuario</option>
+            <option value="admin">Administrador</option>
+          </select>
+        </div>
+
+        <button onclick="crearUsuarioPorAdmin()">Crear usuario</button>
+        <div id="mensaje-admin" class="mensaje oculto"></div>
+      </div>
+
+      <!-- TAB USUARIOS -->
+      <div id="admin-tab-usuarios" class="oculto">
+
+        <div class="card" style="padding:12px;margin:0 0 12px">
+          <div class="form-group" style="margin-bottom:8px">
+            <label>Buscar usuario</label>
+            <input id="buscar-usuario" type="text"
+                   placeholder="Nombre o correo"
+                   oninput="filtrarUsuarios()">
+          </div>
+          <button class="btn-secondary btn-small" onclick="cargarUsuarios()">
+            🔄 Actualizar usuarios
+          </button>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Usuario</th>
+                <th>Rol</th>
+                <th>Estado</th>
+                <th>Último acceso</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="tabla-usuarios"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- TAB BITÁCORA -->
+      <div id="admin-tab-bitacora" class="oculto">
 
         <div class="form-row">
-
-            <div class="form-group">
-
-                <label for="editar-inicio">
-                    Inicio
-                </label>
-
-                <input
-                    type="datetime-local"
-                    id="editar-inicio"
-                >
-
-            </div>
-
-
-            <div class="form-group">
-
-                <label for="editar-fin">
-                    Fin
-                </label>
-
-                <input
-                    type="datetime-local"
-                    id="editar-fin"
-                >
-
-            </div>
-
+          <div class="form-group">
+            <label>Usuario</label>
+            <input id="filtro-bitacora-usuario" type="text"
+                   placeholder="Nombre">
+          </div>
+          <div class="form-group">
+            <label>Acción</label>
+            <input id="filtro-bitacora-accion" type="text"
+                   placeholder="LOGIN, CREAR...">
+          </div>
         </div>
 
+        <button class="btn-secondary btn-small" onclick="cargarBitacora()">
+          🔎 Consultar bitácora
+        </button>
 
-        <div class="form-group">
-
-            <label for="editar-detalles">
-                Detalles
-            </label>
-
-            <textarea
-                id="editar-detalles"
-            ></textarea>
-
+        <div class="table-wrap" style="margin-top:12px">
+          <table style="min-width:850px">
+            <thead>
+              <tr>
+                <th>Fecha</th>
+                <th>Usuario</th>
+                <th>Acción</th>
+                <th>Módulo</th>
+                <th>Detalle</th>
+                <th>Resultado</th>
+              </tr>
+            </thead>
+            <tbody id="tabla-bitacora"></tbody>
+          </table>
         </div>
-
-
-        <div
-            id="mensaje-editar"
-            class="mensaje oculto"
-        ></div>
-
-
-        <div class="modal-actions">
-
-            <button
-                type="button"
-                class="btn-secondary"
-                onclick="cerrarModalEditar()"
-            >
-                Cancelar
-            </button>
-
-            <button
-                type="button"
-                onclick="guardarEdicionCita()"
-            >
-                💾 Guardar Cambios
-            </button>
-
-        </div>
+      </div>
 
     </div>
+  </aside>
+</div>
+</section>
 
+<!-- ================= MODAL EDITAR USUARIO ================= -->
+<div id="modal-editar-usuario" class="modal-bg oculto">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>✏️ Editar usuario</h3>
+      <button class="close" onclick="cerrarModal('modal-editar-usuario')">✕</button>
+    </div>
+
+    <input id="edit-user-id" type="hidden">
+
+    <div class="form-group">
+      <label>Nombre</label>
+      <input id="edit-user-nombre" type="text">
+    </div>
+
+    <div class="form-group">
+      <label>Correo</label>
+      <input id="edit-user-email" type="email">
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>Rol</label>
+        <select id="edit-user-rol">
+          <option value="user">Usuario</option>
+          <option value="admin">Administrador</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Estado</label>
+        <select id="edit-user-estado">
+          <option value="activo">Activo</option>
+          <option value="inactivo">Inactivo</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button onclick="guardarUsuarioEditado()">Guardar cambios</button>
+      <button class="btn-secondary" onclick="cerrarModal('modal-editar-usuario')">Cancelar</button>
+    </div>
+  </div>
 </div>
 
+<!-- ================= MODAL RESET PASSWORD ================= -->
+<div id="modal-reset-password" class="modal-bg oculto">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>🔑 Restablecer contraseña</h3>
+      <button class="close" onclick="cerrarModal('modal-reset-password')">✕</button>
+    </div>
 
-<!-- ========================================================
-     JAVASCRIPT
-========================================================= -->
+    <input id="reset-user-id" type="hidden">
+    <p id="reset-user-text" class="small" style="margin-bottom:15px"></p>
+
+    <div class="form-group">
+      <label>Nueva contraseña temporal</label>
+      <input id="reset-password" type="password"
+             placeholder="Mínimo 6 caracteres">
+    </div>
+
+    <div class="actions">
+      <button onclick="guardarPasswordRestablecida()">Restablecer contraseña</button>
+      <button class="btn-secondary" onclick="cerrarModal('modal-reset-password')">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ================= MODAL EDITAR CITA ================= -->
+<div id="modal-editar-cita" class="modal-bg oculto">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>✏️ Editar cita</h3>
+      <button class="close" onclick="cerrarModal('modal-editar-cita')">✕</button>
+    </div>
+
+    <input id="edit-cita-id" type="hidden">
+
+    <div class="form-group">
+      <label>Título</label>
+      <input id="edit-cita-titulo" type="text">
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>Inicio</label>
+        <input id="edit-cita-inicio" type="datetime-local">
+      </div>
+      <div class="form-group">
+        <label>Fin</label>
+        <input id="edit-cita-fin" type="datetime-local">
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Detalles</label>
+      <input id="edit-cita-detalles" type="text">
+    </div>
+
+    <div class="actions">
+      <button onclick="guardarCitaEditada()">Guardar</button>
+      <button class="btn-secondary" onclick="cerrarModal('modal-editar-cita')">Cancelar</button>
+    </div>
+  </div>
+</div>
 
 <script>
+/* ==========================================================
+   CONFIGURACIÓN
+   ========================================================== */
 
-
-// ==========================================================
-// CONFIGURACIÓN
-// ==========================================================
-
-// IMPORTANTE:
-// Usa aquí la URL de tu implementación /exec.
-//
-// Si al implementar nuevamente Google Apps Script te genera
-// otra URL, cambia este valor.
-
-var API_URL =
-    "https://script.google.com/macros/s/AKfycbxNdmNLHVFFl11cyGYbs_zvzth20SDhLWcuPAw2t-WSWQ6RmPADuX7bjq58sZckaNTuaw/exec";
-
-
-// ==========================================================
-// ESTADO
-// ==========================================================
+var API_URL = "https://script.google.com/macros/s/AKfycbw4-fRnqEbmwUnoH8tD15n9ws5OuWcCQD1scr-vBviVZ0dM3dndi8VRhyRFm29j1faUxg/exec";
 
 var tokenSesion = "";
-
 var miIdUsuario = "";
-
 var miRol = "user";
-
-var miUsuario = "";
-
 var miNombreUsuario = "";
-
 var miColorUsuario = "#4f46e5";
-
 var calendar = null;
+var usuariosAdmin = [];
 
+/* ==========================================================
+   UTILIDADES
+   ========================================================== */
 
-// ==========================================================
-// UTILIDADES UI
-// ==========================================================
+function mostrarMensaje(id,texto,tipo){
+  var el=document.getElementById(id);
+  if(!el)return;
+  el.className=(tipo==="error"?"error":"mensaje");
+  el.textContent=texto;
+  el.classList.remove("oculto");
+  setTimeout(function(){el.classList.add("oculto")},4500);
+}
 
-function mostrarLoading(mostrar) {
+function cerrarModal(id){
+  var el=document.getElementById(id);
+  if(el)el.classList.add("oculto");
+}
 
-    var overlay =
-        document.getElementById(
-            "loading-overlay"
-        );
+function abrirModal(id){
+  var el=document.getElementById(id);
+  if(el)el.classList.remove("oculto");
+}
 
-    if (!overlay) return;
+function escapeHTML(texto){
+  var div=document.createElement("div");
+  div.textContent=String(texto==null?"":texto);
+  return div.innerHTML;
+}
 
-    if (mostrar) {
+function valorFechaLocal(date){
+  var pad=function(n){return String(n).padStart(2,"0")};
+  return date.getFullYear()+"-"+pad(date.getMonth()+1)+"-"+pad(date.getDate())+
+    "T"+pad(date.getHours())+":"+pad(date.getMinutes());
+}
 
-        overlay.classList.remove(
-            "oculto"
-        );
+function convertirFechaInput(valor){
+  if(!valor)return "";
+  return String(valor).replace(" ","T").substring(0,16);
+}
 
-    } else {
+function formatearFecha(valor){
+  if(!valor)return "";
+  var s=String(valor).replace("T"," ");
+  return s.substring(0,16);
+}
 
-        overlay.classList.add(
-            "oculto"
-        );
+/* ==========================================================
+   BACKEND
+   ========================================================== */
+
+async function peticionBackend(payload){
+  try{
+    var response=await fetch(API_URL,{
+      method:"POST",
+      headers:{"Content-Type":"text/plain"},
+      body:JSON.stringify(payload)
+    });
+
+    var texto=await response.text();
+
+    try{
+      return JSON.parse(texto);
+    }catch(e){
+      console.error(texto);
+      return {
+        status:"error",
+        message:"El servidor no devolvió JSON válido. Revisa el deployment de Apps Script."
+      };
     }
+  }catch(error){
+    console.error(error);
+    return {
+      status:"error",
+      message:"Error de conexión: "+error.message
+    };
+  }
 }
 
+/* ==========================================================
+   LOGIN / LOGOUT
+   ========================================================== */
 
-function mostrarMensaje(
-    elementoId,
-    texto,
-    tipo
-) {
+async function iniciarSesion(){
+  var identificador=document.getElementById("input-email").value.trim();
+  var password=document.getElementById("input-contrasena").value;
+  var error=document.getElementById("error-login");
 
-    var elemento =
-        document.getElementById(
-            elementoId
-        );
+  error.classList.add("oculto");
 
-    if (!elemento) return;
+  if(!identificador||!password){
+    error.textContent="❌ Usuario/correo y contraseña son obligatorios.";
+    error.classList.remove("oculto");
+    return;
+  }
 
+  var resultado=await peticionBackend({
+    accion:"login",
+    email:identificador,
+    password:password
+  });
 
-    elemento.textContent =
-        texto;
+  if(resultado&&resultado.status==="success"){
+    tokenSesion=resultado.token||"";
+    miIdUsuario=resultado.usuario.id;
+    miRol=resultado.usuario.rol||"user";
+    miNombreUsuario=resultado.usuario.nombre||"";
+    miColorUsuario=resultado.usuario.color||"#4f46e5";
 
+    // Mantiene la sesión durante un refresh de la página.
+    sessionStorage.setItem("agenda_token",tokenSesion);
 
-    elemento.className =
-        "mensaje " +
-        (
-            tipo === "exito"
-                ? "exito"
-                : "error"
-        );
+    document.getElementById("pantalla-login").classList.add("oculto");
+    document.getElementById("pantalla-panel").classList.remove("oculto");
+    document.getElementById("mensaje-bienvenida").textContent=
+      miNombreUsuario+" ("+miRol.toUpperCase()+")";
+
+    if(miRol==="admin"){
+      document.getElementById("seccion-admin").classList.remove("oculto");
+      document.getElementById("card-leyenda-admin").classList.remove("oculto");
+    }else{
+      document.getElementById("seccion-admin").classList.add("oculto");
+      document.getElementById("card-leyenda-admin").classList.add("oculto");
+    }
+
+    setTimeout(function(){
+      inicializarCalendario();
+      cargarCitas();
+      if(miRol==="admin")cargarUsuarios();
+    },100);
+
+  }else{
+    error.textContent="❌ "+(resultado&&resultado.message||"No fue posible iniciar sesión.");
+    error.classList.remove("oculto");
+  }
 }
 
+async function restaurarSesion(){
+  var token=sessionStorage.getItem("agenda_token");
+  if(!token)return;
 
-function ocultarMensaje(elementoId) {
+  var resultado=await peticionBackend({
+    accion:"obtener_perfil",
+    token:token
+  });
 
-    var elemento =
-        document.getElementById(
-            elementoId
-        );
+  if(resultado&&resultado.status==="success"&&resultado.usuario){
+    tokenSesion=token;
+    miIdUsuario=resultado.usuario.id;
+    miRol=resultado.usuario.rol||"user";
+    miNombreUsuario=resultado.usuario.nombre||"";
+    miColorUsuario=resultado.usuario.color||"#4f46e5";
 
-    if (!elemento) return;
+    document.getElementById("pantalla-login").classList.add("oculto");
+    document.getElementById("pantalla-panel").classList.remove("oculto");
+    document.getElementById("mensaje-bienvenida").textContent=
+      miNombreUsuario+" ("+miRol.toUpperCase()+")";
 
-    elemento.classList.add(
-        "oculto"
+    if(miRol==="admin"){
+      document.getElementById("seccion-admin").classList.remove("oculto");
+      document.getElementById("card-leyenda-admin").classList.remove("oculto");
+      cargarUsuarios();
+    }else{
+      document.getElementById("seccion-admin").classList.add("oculto");
+      document.getElementById("card-leyenda-admin").classList.add("oculto");
+    }
+
+    setTimeout(function(){
+      inicializarCalendario();
+      cargarCitas();
+    },100);
+  }else{
+    sessionStorage.removeItem("agenda_token");
+  }
+}
+
+/**
+ * La sesión se guarda en sessionStorage, pero el perfil no se confía
+ * para autorización. El servidor valida el token en cada operación.
+ */
+function cerrarSesion(){
+  if(tokenSesion){
+    peticionBackend({
+      accion:"logout",
+      token:tokenSesion
+    });
+  }
+
+  sessionStorage.removeItem("agenda_token");
+
+  tokenSesion="";
+  miIdUsuario="";
+  miRol="user";
+  miNombreUsuario="";
+  miColorUsuario="#4f46e5";
+
+  if(calendar){
+    calendar.removeAllEvents();
+    calendar.destroy();
+    calendar=null;
+  }
+
+  document.getElementById("pantalla-panel").classList.add("oculto");
+  document.getElementById("pantalla-login").classList.remove("oculto");
+
+  document.getElementById("input-email").value="";
+  document.getElementById("input-contrasena").value="";
+}
+
+/* ==========================================================
+   CALENDARIO
+   ========================================================== */
+
+function inicializarCalendario(){
+  var el=document.getElementById("calendar");
+  if(!el)return;
+
+  if(calendar){
+    calendar.destroy();
+    calendar=null;
+  }
+
+  calendar=new FullCalendar.Calendar(el,{
+    initialView:"dayGridMonth",
+    locale:"es",
+    height:"auto",
+    headerToolbar:{
+      left:"prev,next today",
+      center:"title",
+      right:"dayGridMonth,timeGridWeek"
+    },
+    dateClick:function(info){
+      document.getElementById("cita-inicio").value=
+        info.dateStr+"T09:00";
+      document.getElementById("cita-fin").value=
+        info.dateStr+"T10:00";
+
+      document.getElementById("cita-titulo").focus();
+    },
+    eventClick:function(info){
+      var u=info.event.extendedProps.usuario||"";
+      var d=info.event.extendedProps.descripcion||"Sin detalles";
+      alert(
+        "📌 "+info.event.title+
+        "\n👤 "+u+
+        "\n⏰ "+formatearFecha(info.event.start?.toISOString())+
+        "\n📝 "+d
+      );
+    }
+  });
+
+  calendar.render();
+}
+
+function autocompletarFin(){
+  var inicio=document.getElementById("cita-inicio").value;
+  var fin=document.getElementById("cita-fin");
+
+  if(!inicio||fin.value)return;
+
+  var d=new Date(inicio);
+  d.setHours(d.getHours()+1);
+  fin.value=valorFechaLocal(d);
+}
+
+/* ==========================================================
+   CITAS
+   ========================================================== */
+
+async function crearNuevaCita(){
+  var titulo=document.getElementById("cita-titulo").value.trim();
+  var inicio=document.getElementById("cita-inicio").value;
+  var fin=document.getElementById("cita-fin").value;
+  var descripcion=document.getElementById("cita-detalles").value.trim();
+
+  if(!titulo||!inicio){
+    mostrarMensaje("mensaje-cita","❌ Título e inicio son obligatorios.","error");
+    return;
+  }
+
+  if(!fin)fin=inicio;
+
+  var resultado=await peticionBackend({
+    accion:"crear_cita",
+    token:tokenSesion,
+    cita:{
+      titulo:titulo,
+      inicio:inicio,
+      fin:fin,
+      descripcion:descripcion
+    }
+  });
+
+  if(resultado&&resultado.status==="success"){
+    mostrarMensaje("mensaje-cita","✅ Cita agendada correctamente.","ok");
+
+    document.getElementById("cita-titulo").value="";
+    document.getElementById("cita-inicio").value="";
+    document.getElementById("cita-fin").value="";
+    document.getElementById("cita-detalles").value="";
+
+    cargarCitas();
+  }else{
+    mostrarMensaje(
+      "mensaje-cita",
+      "❌ "+(resultado&&resultado.message||"No se pudo crear la cita."),
+      "error"
     );
+  }
 }
 
+async function cargarCitas(){
+  if(!tokenSesion)return;
 
-// ==========================================================
-// PETICIÓN BACKEND
-// ==========================================================
+  var resultado=await peticionBackend({
+    accion:"obtener_citas",
+    token:tokenSesion
+  });
 
-async function peticionBackend(
-    datosPayload
-) {
+  var lista=document.getElementById("lista-citas");
+  lista.innerHTML="";
 
-    try {
+  if(calendar)calendar.removeAllEvents();
 
-        var response =
-            await fetch(
-                API_URL,
-                {
-                    method: "POST",
+  var usuariosVistos={};
 
-                    headers: {
-                        "Content-Type":
-                            "text/plain;charset=utf-8"
-                    },
+  if(
+    resultado&&resultado.status==="success"&&
+    resultado.citas&&resultado.citas.length
+  ){
+    resultado.citas.forEach(function(cita){
 
-                    body:
-                        JSON.stringify(
-                            datosPayload
-                        )
-                }
-            );
+      var usuario=(cita.extendedProps&&cita.extendedProps.usuario)||"";
+      var descripcion=(cita.extendedProps&&cita.extendedProps.descripcion)||"";
+      var color=cita.backgroundColor||"#3498db";
 
+      usuariosVistos[usuario]=color;
 
-        var texto =
-            await response.text();
-
-
-        try {
-
-            return JSON.parse(
-                texto
-            );
-
-        } catch (errorJSON) {
-
-            console.error(
-                "Respuesta no JSON:",
-                texto
-            );
-
-
-            return {
-
-                status: "error",
-
-                message:
-                    "El servidor no respondió JSON válido. Revisa la implementación de Apps Script."
-            };
-        }
-
-
-    } catch (error) {
-
-        console.error(
-            "Error de conexión:",
-            error
-        );
-
-
-        return {
-
-            status: "error",
-
-            message:
-                "Error de conexión con el servidor: " +
-                error.message
-        };
-    }
-}
-
-
-// ==========================================================
-// PING
-// ==========================================================
-
-async function probarConexion() {
-
-    var resultado =
-        await peticionBackend({
-            accion: "ping"
+      if(calendar){
+        calendar.addEvent({
+          id:cita.id,
+          title:miRol==="admin" ? usuario+": "+cita.title : cita.title,
+          start:cita.start,
+          end:cita.end,
+          backgroundColor:color,
+          borderColor:color,
+          textColor:"#fff",
+          extendedProps:{
+            usuario:usuario,
+            descripcion:descripcion
+          }
         });
+      }
 
+      var li=document.createElement("li");
+      li.style.borderLeftColor=color;
 
-    console.log(
-        "Resultado de ping:",
-        resultado
+      if(miRol==="admin"){
+        var tag=document.createElement("span");
+        tag.className="chip";
+        tag.style.backgroundColor=color;
+        tag.textContent="👤 "+usuario;
+        li.appendChild(tag);
+      }
+
+      var title=document.createElement("div");
+      title.className="list-title";
+      title.textContent=cita.title;
+
+      var date=document.createElement("div");
+      date.className="list-date";
+      date.textContent=
+        "⏰ "+formatearFecha(cita.start)+
+        (cita.end?" → "+formatearFecha(cita.end):"");
+
+      var notes=document.createElement("div");
+      notes.className="list-notes";
+      notes.textContent=
+        descripcion ? "📝 "+descripcion : "Sin detalles adicionales";
+
+      var actions=document.createElement("div");
+      actions.className="actions";
+
+      // Un usuario normal solo recibe botones para sus propias citas.
+      // El administrador puede administrar todas.
+      if(miRol==="admin"||usuario===miNombreUsuario){
+        var edit=document.createElement("button");
+        edit.className="btn-warning btn-small";
+        edit.textContent="✏️ Editar";
+        edit.onclick=function(){
+          abrirEditarCita(cita);
+        };
+
+        var del=document.createElement("button");
+        del.className="btn-danger btn-small";
+        del.textContent="🗑️ Eliminar";
+        del.onclick=function(){
+          eliminarMiCita(cita.id);
+        };
+
+        actions.appendChild(edit);
+        actions.appendChild(del);
+      }
+
+      li.appendChild(title);
+      li.appendChild(date);
+      li.appendChild(notes);
+
+      if(actions.children.length)li.appendChild(actions);
+
+      lista.appendChild(li);
+    });
+
+    if(miRol==="admin")actualizarLeyendaAdmin(usuariosVistos);
+
+  }else{
+    var vacio=document.createElement("li");
+    vacio.textContent=
+      resultado&&resultado.message
+      ? "❌ "+resultado.message
+      : "No hay citas agendadas actualmente.";
+    lista.appendChild(vacio);
+  }
+}
+
+function actualizarLeyendaAdmin(usuariosVistos){
+  var cont=document.getElementById("leyenda-usuarios");
+  cont.innerHTML="";
+
+  Object.keys(usuariosVistos).forEach(function(nombre){
+    var chip=document.createElement("span");
+    chip.className="chip";
+    chip.style.backgroundColor=usuariosVistos[nombre];
+    chip.textContent="👤 "+nombre;
+    cont.appendChild(chip);
+  });
+}
+
+function abrirEditarCita(cita){
+  document.getElementById("edit-cita-id").value=cita.id;
+  document.getElementById("edit-cita-titulo").value=cita.title||"";
+  document.getElementById("edit-cita-inicio").value=
+    convertirFechaInput(cita.start);
+  document.getElementById("edit-cita-fin").value=
+    convertirFechaInput(cita.end||cita.start);
+  document.getElementById("edit-cita-detalles").value=
+    (cita.extendedProps&&cita.extendedProps.descripcion)||"";
+
+  abrirModal("modal-editar-cita");
+}
+
+async function guardarCitaEditada(){
+  var id=document.getElementById("edit-cita-id").value;
+  var titulo=document.getElementById("edit-cita-titulo").value.trim();
+  var inicio=document.getElementById("edit-cita-inicio").value;
+  var fin=document.getElementById("edit-cita-fin").value;
+  var detalles=document.getElementById("edit-cita-detalles").value.trim();
+
+  if(!id||!titulo||!inicio||!fin){
+    alert("Completa todos los campos de la cita.");
+    return;
+  }
+
+  var resultado=await peticionBackend({
+    accion:"editar_cita",
+    token:tokenSesion,
+    cita:{
+      id:id,
+      titulo:titulo,
+      inicio:inicio,
+      fin:fin,
+      descripcion:detalles
+    }
+  });
+
+  if(resultado&&resultado.status==="success"){
+    cerrarModal("modal-editar-cita");
+    cargarCitas();
+  }else{
+    alert("❌ "+(resultado&&resultado.message||"No se pudo editar."));
+  }
+}
+
+async function eliminarMiCita(id){
+  if(!confirm("¿Seguro que deseas eliminar esta cita?"))return;
+
+  var resultado=await peticionBackend({
+    accion:"eliminar_cita",
+    token:tokenSesion,
+    id:id
+  });
+
+  if(resultado&&resultado.status==="success"){
+    cargarCitas();
+  }else{
+    alert("❌ "+(resultado&&resultado.message||"No se pudo eliminar."));
+  }
+}
+
+/* ==========================================================
+   ADMIN: TABS
+   ========================================================== */
+
+function mostrarTabAdmin(tab){
+  var tabs=["crear","usuarios","bitacora"];
+
+  tabs.forEach(function(t){
+    document.getElementById("admin-tab-"+t).classList.add("oculto");
+    document.getElementById("tab-btn-"+t).classList.remove("active");
+  });
+
+  document.getElementById("admin-tab-"+tab).classList.remove("oculto");
+  document.getElementById("tab-btn-"+tab).classList.add("active");
+
+  if(tab==="usuarios")cargarUsuarios();
+  if(tab==="bitacora")cargarBitacora();
+}
+
+/* ==========================================================
+   ADMIN: CREAR USUARIO
+   ========================================================== */
+
+async function crearUsuarioPorAdmin(){
+  var nombre=document.getElementById("admin-nombre").value.trim();
+  var email=document.getElementById("admin-email").value.trim();
+  var password=document.getElementById("admin-contrasena").value;
+  var rol=document.getElementById("admin-rol").value;
+
+  if(!nombre||!email||!password){
+    mostrarMensaje(
+      "mensaje-admin",
+      "❌ Nombre, correo y contraseña son obligatorios.",
+      "error"
+    );
+    return;
+  }
+
+  var resultado=await peticionBackend({
+    accion:"crear_usuario",
+    token:tokenSesion,
+    nuevoUsuario:{
+      nombre:nombre,
+      email:email,
+      password:password,
+      rol:rol
+    }
+  });
+
+  if(resultado&&resultado.status==="success"){
+    mostrarMensaje(
+      "mensaje-admin",
+      "✅ Usuario creado correctamente.",
+      "ok"
     );
 
+    document.getElementById("admin-nombre").value="";
+    document.getElementById("admin-email").value="";
+    document.getElementById("admin-contrasena").value="";
+    document.getElementById("admin-rol").value="user";
 
-    return resultado;
+    cargarUsuarios();
+  }else{
+    mostrarMensaje(
+      "mensaje-admin",
+      "❌ "+(resultado&&resultado.message||"No se pudo crear el usuario."),
+      "error"
+    );
+  }
 }
 
+/* ==========================================================
+   ADMIN: USUARIOS
+   ========================================================== */
 
-window.probarConexion =
-    probarConexion;
+async function cargarUsuarios(){
+  if(miRol!=="admin")return;
 
+  var resultado=await peticionBackend({
+    accion:"listar_usuarios",
+    token:tokenSesion
+  });
 
-// ==========================================================
-// CALENDARIO
-// ==========================================================
-
-function inicializarCalendario() {
-
-    var calendarEl =
-        document.getElementById(
-            "calendar"
-        );
-
-
-    if (!calendarEl) {
-        return;
-    }
-
-
-    // Evitar crear el calendario dos veces.
-
-    if (calendar) {
-
-        calendar.destroy();
-
-        calendar = null;
-    }
-
-
-    calendar =
-        new FullCalendar.Calendar(
-            calendarEl,
-            {
-
-                initialView:
-                    "dayGridMonth",
-
-                locale:
-                    "es",
-
-                firstDay:
-                    1,
-
-                height:
-                    "auto",
-
-                nowIndicator:
-                    true,
-
-                selectable:
-                    false,
-
-                headerToolbar: {
-
-                    left:
-                        "prev,next today",
-
-                    center:
-                        "title",
-
-                    right:
-                        "dayGridMonth,timeGridWeek"
-                },
-
-
-                buttonText: {
-
-                    today:
-                        "Hoy",
-
-                    month:
-                        "Mes",
-
-                    week:
-                        "Semana"
-                },
-
-
-                dateClick:
-                    function(info) {
-
-                        seleccionarFechaCalendario(
-                            info.dateStr
-                        );
-                    },
-
-
-                eventClick:
-                    function(info) {
-
-                        mostrarDetallesEvento(
-                            info.event
-                        );
-                    }
-            }
-        );
-
-
-    calendar.render();
+  if(resultado&&resultado.status==="success"){
+    usuariosAdmin=resultado.usuarios||[];
+    renderUsuarios(usuariosAdmin);
+  }else{
+    alert("❌ "+(resultado&&resultado.message||"No se pudieron cargar los usuarios."));
+  }
 }
 
+function renderUsuarios(lista){
+  var tbody=document.getElementById("tabla-usuarios");
+  tbody.innerHTML="";
 
-// ==========================================================
-// SELECCIONAR FECHA
-// ==========================================================
+  lista.forEach(function(u){
+    var tr=document.createElement("tr");
 
-function seleccionarFechaCalendario(
-    fecha
-) {
+    var tdUsuario=document.createElement("td");
+    tdUsuario.innerHTML=
+      "<strong>"+escapeHTML(u.nombre)+"</strong><br>"+
+      "<span class='small'>"+escapeHTML(u.email)+"</span>";
 
-    var inicio =
-        document.getElementById(
-            "cita-inicio"
-        );
+    var tdRol=document.createElement("td");
+    tdRol.className="role";
+    tdRol.textContent=u.rol==="admin"?"Administrador":"Usuario";
 
-    var fin =
-        document.getElementById(
-            "cita-fin"
-        );
+    var tdEstado=document.createElement("td");
+    var status=document.createElement("span");
+    status.className="status "+(u.estado==="activo"?"activo":"inactivo");
+    status.textContent=u.estado.toUpperCase();
+    tdEstado.appendChild(status);
 
+    var tdAcceso=document.createElement("td");
+    tdAcceso.className="small";
+    tdAcceso.textContent=u.ultimoAcceso||"Nunca";
 
-    if (!inicio) {
-        return;
+    var tdAcciones=document.createElement("td");
+    var acciones=document.createElement("div");
+    acciones.className="actions";
+
+    var editar=document.createElement("button");
+    editar.className="btn-secondary btn-small";
+    editar.textContent="✏️ Editar";
+    editar.onclick=function(){abrirEditarUsuario(u)};
+
+    var reset=document.createElement("button");
+    reset.className="btn-warning btn-small";
+    reset.textContent="🔑 Password";
+    reset.onclick=function(){abrirResetPassword(u)};
+
+    acciones.appendChild(editar);
+    acciones.appendChild(reset);
+    tdAcciones.appendChild(acciones);
+
+    tr.appendChild(tdUsuario);
+    tr.appendChild(tdRol);
+    tr.appendChild(tdEstado);
+    tr.appendChild(tdAcceso);
+    tr.appendChild(tdAcciones);
+
+    tbody.appendChild(tr);
+  });
+}
+
+function filtrarUsuarios(){
+  var q=document.getElementById("buscar-usuario").value.trim().toLowerCase();
+
+  var filtrados=usuariosAdmin.filter(function(u){
+    return (
+      String(u.nombre).toLowerCase().includes(q) ||
+      String(u.email).toLowerCase().includes(q)
+    );
+  });
+
+  renderUsuarios(filtrados);
+}
+
+function abrirEditarUsuario(u){
+  document.getElementById("edit-user-id").value=u.id;
+  document.getElementById("edit-user-nombre").value=u.nombre;
+  document.getElementById("edit-user-email").value=u.email;
+  document.getElementById("edit-user-rol").value=u.rol;
+  document.getElementById("edit-user-estado").value=u.estado;
+
+  abrirModal("modal-editar-usuario");
+}
+
+async function guardarUsuarioEditado(){
+  var id=document.getElementById("edit-user-id").value;
+  var nombre=document.getElementById("edit-user-nombre").value.trim();
+  var email=document.getElementById("edit-user-email").value.trim();
+  var rol=document.getElementById("edit-user-rol").value;
+  var estado=document.getElementById("edit-user-estado").value;
+
+  if(!nombre||!email){
+    alert("Nombre y correo son obligatorios.");
+    return;
+  }
+
+  var resultado=await peticionBackend({
+    accion:"actualizar_usuario",
+    token:tokenSesion,
+    usuario:{
+      id:id,
+      nombre:nombre,
+      email:email,
+      rol:rol,
+      estado:estado
+    }
+  });
+
+  if(resultado&&resultado.status==="success"){
+    cerrarModal("modal-editar-usuario");
+    cargarUsuarios();
+
+    if(String(id)===String(miIdUsuario)){
+      miNombreUsuario=nombre;
+      miRol=rol;
+      document.getElementById("mensaje-bienvenida").textContent=
+        miNombreUsuario+" ("+miRol.toUpperCase()+")";
     }
 
+    cargarCitas();
+  }else{
+    alert("❌ "+(resultado&&resultado.message||"No se pudo actualizar."));
+  }
+}
 
-    inicio.value =
-        fecha + "T09:00";
+/* ==========================================================
+   ADMIN: RESET PASSWORD
+   ========================================================== */
 
+function abrirResetPassword(u){
+  document.getElementById("reset-user-id").value=u.id;
+  document.getElementById("reset-password").value="";
+  document.getElementById("reset-user-text").textContent=
+    "Usuario seleccionado: "+u.nombre+" ("+u.email+").";
 
-    if (fin) {
+  abrirModal("modal-reset-password");
+}
 
-        fin.value =
-            fecha + "T10:00";
-    }
+async function guardarPasswordRestablecida(){
+  var id=document.getElementById("reset-user-id").value;
+  var password=document.getElementById("reset-password").value;
 
+  if(!password){
+    alert("Escribe la nueva contraseña temporal.");
+    return;
+  }
 
-    inicio.focus();
+  var resultado=await peticionBackend({
+    accion:"restablecer_password",
+    token:tokenSesion,
+    idUsuarioObjetivo:id,
+    nuevaPassword:password
+  });
 
+  if(resultado&&resultado.status==="success"){
+    cerrarModal("modal-reset-password");
+    alert("✅ Contraseña restablecida. Entrega al usuario la contraseña temporal y pídele cambiarla al ingresar.");
+  }else{
+    alert("❌ "+(resultado&&resultado.message||"No se pudo restablecer."));
+  }
+}
+
+/* ==========================================================
+   MI PASSWORD
+   ========================================================== */
+
+async function cambiarMiPassword(){
+  var actual=document.getElementById("mi-password-actual").value;
+  var nueva=document.getElementById("mi-password-nueva").value;
+
+  if(!actual||!nueva){
+    mostrarMensaje(
+      "mensaje-password",
+      "❌ Completa ambas contraseñas.",
+      "error"
+    );
+    return;
+  }
+
+  var resultado=await peticionBackend({
+    accion:"cambiar_mi_password",
+    token:tokenSesion,
+    passwordActual:actual,
+    nuevaPassword:nueva
+  });
+
+  if(resultado&&resultado.status==="success"){
+    document.getElementById("mi-password-actual").value="";
+    document.getElementById("mi-password-nueva").value="";
 
     mostrarMensaje(
-        "mensaje-cita",
-        "Fecha seleccionada. Completa el título y guarda la cita.",
-        "exito"
+      "mensaje-password",
+      "✅ Contraseña cambiada correctamente.",
+      "ok"
     );
-}
-
-
-// ==========================================================
-// AUTOCOMPLETAR FIN
-// ==========================================================
-
-function autocompletarFin() {
-
-    var inicioEl =
-        document.getElementById(
-            "cita-inicio"
-        );
-
-    var finEl =
-        document.getElementById(
-            "cita-fin"
-        );
-
-
-    if (
-        !inicioEl ||
-        !finEl ||
-        !inicioEl.value
-    ) {
-
-        return;
-    }
-
-
-    // Solamente completar si está vacío.
-
-    if (finEl.value) {
-        return;
-    }
-
-
-    var inicio =
-        new Date(
-            inicioEl.value
-        );
-
-
-    if (isNaN(
-        inicio.getTime()
-    )) {
-
-        return;
-    }
-
-
-    inicio.setHours(
-        inicio.getHours() + 1
+  }else{
+    mostrarMensaje(
+      "mensaje-password",
+      "❌ "+(resultado&&resultado.message||"No se pudo cambiar."),
+      "error"
     );
-
-
-    finEl.value =
-        convertirDateTimeLocal(
-            inicio
-        );
+  }
 }
 
+/* ==========================================================
+   ADMIN: BITÁCORA
+   ========================================================== */
 
-// ==========================================================
-// CONVERTIR DATE A DATETIME-LOCAL
-// ==========================================================
+async function cargarBitacora(){
+  if(miRol!=="admin")return;
 
-function convertirDateTimeLocal(
-    fecha
-) {
+  var usuario=document.getElementById("filtro-bitacora-usuario").value.trim();
+  var accion=document.getElementById("filtro-bitacora-accion").value.trim();
 
-    var pad =
-        function(n) {
+  var resultado=await peticionBackend({
+    accion:"obtener_bitacora",
+    token:tokenSesion,
+    filtros:{
+      usuario:usuario,
+      accion:accion,
+      limite:300
+    }
+  });
 
-            return String(n)
-                .padStart(2, "0");
-        };
+  var tbody=document.getElementById("tabla-bitacora");
+  tbody.innerHTML="";
 
+  if(!(resultado&&resultado.status==="success")){
+    alert("❌ "+(resultado&&resultado.message||"No se pudo consultar la bitácora."));
+    return;
+  }
 
-    return (
+  (resultado.registros||[]).forEach(function(r){
+    var tr=document.createElement("tr");
 
-        fecha.getFullYear() +
-        "-" +
-        pad(
-            fecha.getMonth() + 1
-        ) +
-        "-" +
-        pad(
-            fecha.getDate()
-        ) +
-        "T" +
-        pad(
-            fecha.getHours()
-        ) +
-        ":" +
-        pad(
-            fecha.getMinutes()
-        )
-    );
+    var c1=document.createElement("td");
+    c1.textContent=r.fecha;
+
+    var c2=document.createElement("td");
+    c2.textContent=r.usuario;
+
+    var c3=document.createElement("td");
+    c3.textContent=r.accion;
+
+    var c4=document.createElement("td");
+    c4.textContent=r.modulo;
+
+    var c5=document.createElement("td");
+    c5.textContent=r.detalle;
+
+    var c6=document.createElement("td");
+    c6.textContent=r.resultado;
+
+    tr.appendChild(c1);
+    tr.appendChild(c2);
+    tr.appendChild(c3);
+    tr.appendChild(c4);
+    tr.appendChild(c5);
+    tr.appendChild(c6);
+
+    tbody.appendChild(tr);
+  });
 }
 
-
-// ==========================================================
-// LOGIN
-// ==========================================================
-
-async function iniciarSesion() {
-
-    var usuarioEl =
-        document.getElementById(
-            "input-usuario"
-        );
-
-    var passwordEl =
-        document.getElementById(
-            "input-contrasena"
-        );
-
-    var errorDiv =
-        document.getElementById(
-            "error-login"
-        );
-
-
-    var boton =
-        document.getElementById(
-            "btn-login"
-        );
-
-
-    if (
-        !usuarioEl ||
-        !passwordEl
-    ) {
-
-        return;
-    }
-
-
-    var usuario =
-        usuarioEl.value.trim();
-
-
-    var password =
-        passwordEl.value;
-
-
-    if (errorDiv) {
-
-        errorDiv.classList.add(
-            "oculto"
-        );
-    }
-
-
-    if (
-        !usuario ||
-        !password
-    ) {
-
-        mostrarErrorLogin(
-            "Usuario y contraseña son obligatorios."
-        );
-
-        return;
-    }
-
-
-    if (boton) {
-
-        boton.disabled =
-            true;
-
-        boton.textContent =
-            "⏳ Iniciando sesión...";
-    }
-
-
-    mostrarLoading(true);
-
-
-    var resultado =
-        await peticionBackend({
-
-            accion:
-                "login",
-
-            usuario:
-                usuario,
-
-            password:
-                password
-        });
-
-
-    mostrarLoading(false);
-
-
-    if (
-        resultado &&
-        resultado.status ===
-            "success"
-    ) {
-
-        var u =
-            resultado.usuario ||
-            {};
-
-
-        tokenSesion =
-            resultado.token ||
-            "";
-
-
-        miIdUsuario =
-            u.id ||
-            "";
-
-
-        miRol =
-            u.rol ||
-            "user";
-
-
-        miUsuario =
-            u.usuario ||
-            "";
-
-
-        miNombreUsuario =
-            u.nombre ||
-            miUsuario ||
-            "Usuario";
-
-
-        miColorUsuario =
-            u.color ||
-            "#4f46e5";
-
-
-        mostrarPanel();
-
-
-        if (boton) {
-
-            boton.disabled =
-                false;
-
-            boton.textContent =
-                "🔐 Entrar al Sistema";
-        }
-
-
-        // Cargar calendario después
-        // de mostrar el panel.
-
-        setTimeout(
-            function() {
-
-                inicializarCalendario();
-
-                cargarCitas();
-
-            },
-            100
-        );
-
-
-    } else {
-
-        if (boton) {
-
-            boton.disabled =
-                false;
-
-            boton.textContent =
-                "🔐 Entrar al Sistema";
-        }
-
-
-        mostrarErrorLogin(
-
-            resultado &&
-            resultado.message
-
-                ? resultado.message
-
-                : "No fue posible iniciar sesión."
-        );
-    }
+/* ==========================================================
+   CONEXIÓN
+   ========================================================== */
+
+async function probarConexion(){
+  var r=await peticionBackend({accion:"ping"});
+  console.log("Ping:",r);
+  return r;
 }
 
-
-// ==========================================================
-// MOSTRAR ERROR LOGIN
-// ==========================================================
-
-function mostrarErrorLogin(
-    mensaje
-) {
-
-    var errorDiv =
-        document.getElementById(
-            "error-login"
-        );
-
-
-    if (!errorDiv) return;
-
-
-    errorDiv.textContent =
-        "❌ " + mensaje;
-
-
-    errorDiv.classList.remove(
-        "oculto"
-    );
-}
-
-
-// ==========================================================
-// MOSTRAR PANEL
-// ==========================================================
-
-function mostrarPanel() {
-
-    var login =
-        document.getElementById(
-            "pantalla-login"
-        );
-
-
-    var panel =
-        document.getElementById(
-            "pantalla-panel"
-        );
-
-
-    if (login) {
-
-        login.classList.add(
-            "oculto"
-        );
-    }
-
-
-    if (panel) {
-
-        panel.classList.remove(
-            "oculto"
-        );
-    }
-
-
-    var bienvenida =
-        document.getElementById(
-            "mensaje-bienvenida"
-        );
-
-
-    if (bienvenida) {
-
-        bienvenida.textContent =
-            miNombreUsuario +
-            " (" +
-            miRol.toUpperCase() +
-            ")";
-    }
-
-
-    var avatar =
-        document.getElementById(
-            "usuario-avatar"
-        );
-
-
-    if (avatar) {
-
-        avatar.textContent =
-            obtenerIniciales(
-                miNombreUsuario
-            );
-
-        avatar.style.background =
-            miColorUsuario;
-    }
-
-
-    var admin =
-        document.getElementById(
-            "seccion-admin"
-        );
-
-
-    var leyenda =
-        document.getElementById(
-            "card-leyenda-admin"
-        );
-
-
-    if (miRol === "admin") {
-
-        if (admin) {
-
-            admin.classList.remove(
-                "oculto"
-            );
-        }
-
-
-        if (leyenda) {
-
-            leyenda.classList.remove(
-                "oculto"
-            );
-        }
-
-    } else {
-
-        if (admin) {
-
-            admin.classList.add(
-                "oculto"
-            );
-        }
-
-
-        if (leyenda) {
-
-            leyenda.classList.add(
-                "oculto"
-            );
-        }
-    }
-}
-
-
-// ==========================================================
-// INICIALES
-// ==========================================================
-
-function obtenerIniciales(
-    nombre
-) {
-
-    var texto =
-        String(
-            nombre || ""
-        ).trim();
-
-
-    if (!texto) {
-        return "👤";
-    }
-
-
-    var partes =
-        texto.split(
-            /\s+/
-        );
-
-
-    if (
-        partes.length === 1
-    ) {
-
-        return partes[0]
-            .substring(0, 2)
-            .toUpperCase();
-    }
-
-
-    return (
-
-        partes[0]
-            .charAt(0) +
-
-        partes[1]
-            .charAt(0)
-
-    ).toUpperCase();
-}
-
-
-// ==========================================================
-// CERRAR SESIÓN
-// ==========================================================
-
-async function cerrarSesion() {
-
-    var tokenActual =
-        tokenSesion;
-
-
-    // Limpiar sesión local inmediatamente.
-
-    tokenSesion =
-        "";
-
-    miIdUsuario =
-        "";
-
-    miRol =
-        "user";
-
-    miUsuario =
-        "";
-
-    miNombreUsuario =
-        "";
-
-    miColorUsuario =
-        "#4f46e5";
-
-
-    if (tokenActual) {
-
-        await peticionBackend({
-
-            accion:
-                "logout",
-
-            token:
-                tokenActual
-        });
-    }
-
-
-    if (calendar) {
-
-        calendar.destroy();
-
-        calendar =
-            null;
-    }
-
-
-    limpiarFormulario();
-
-
-    var panel =
-        document.getElementById(
-            "pantalla-panel"
-        );
-
-
-    var login =
-        document.getElementById(
-            "pantalla-login"
-        );
-
-
-    if (panel) {
-
-        panel.classList.add(
-            "oculto"
-        );
-    }
-
-
-    if (login) {
-
-        login.classList.remove(
-            "oculto"
-        );
-    }
-
-
-    var usuarioEl =
-        document.getElementById(
-            "input-usuario"
-        );
-
-
-    if (usuarioEl) {
-
-        usuarioEl.value =
-            "";
-
-        usuarioEl.focus();
-    }
-
-
-    var passwordEl =
-        document.getElementById(
-            "input-contrasena"
-        );
-
-
-    if (passwordEl) {
-
-        passwordEl.value =
-            "";
-    }
-}
-
-
-// ==========================================================
-// LIMPIAR FORMULARIO
-// ==========================================================
-
-function limpiarFormulario() {
-
-    var campos = [
-
-        "cita-titulo",
-        "cita-inicio",
-        "cita-fin",
-        "cita-detalles",
-
-        "admin-usuario",
-        "admin-nombre",
-        "admin-contrasena"
-
-    ];
-
-
-    campos.forEach(
-        function(id) {
-
-            var elemento =
-                document.getElementById(
-                    id
-                );
-
-            if (elemento) {
-
-                elemento.value =
-                    "";
-            }
-        }
-    );
-
-
-    ocultarMensaje(
-        "mensaje-cita"
-    );
-
-
-    ocultarMensaje(
-        "mensaje-admin"
-    );
-}
-
-
-// ==========================================================
-// CREAR CITA
-// ==========================================================
-
-async function crearNuevaCita() {
-
-    if (!tokenSesion) {
-
-        alert(
-            "Tu sesión ha expirado. Inicia sesión nuevamente."
-        );
-
-        return;
-    }
-
-
-    var tituloEl =
-        document.getElementById(
-            "cita-titulo"
-        );
-
-
-    var inicioEl =
-        document.getElementById(
-            "cita-inicio"
-        );
-
-
-    var finEl =
-        document.getElementById(
-            "cita-fin"
-        );
-
-
-    var detallesEl =
-        document.getElementById(
-            "cita-detalles"
-        );
-
-
-    var titulo =
-        tituloEl
-            ? tituloEl.value.trim()
-            : "";
-
-
-    var inicio =
-        inicioEl
-            ? inicioEl.value
-            : "";
-
-
-    var fin =
-        finEl
-            ? finEl.value
-            : "";
-
-
-    var detalles =
-        detallesEl
-            ? detallesEl.value.trim()
-            : "";
-
-
-    ocultarMensaje(
-        "mensaje-cita"
-    );
-
-
-    if (!titulo) {
-
-        mostrarMensaje(
-            "mensaje-cita",
-            "El título es obligatorio.",
-            "error"
-        );
-
-        return;
-    }
-
-
-    if (!inicio) {
-
-        mostrarMensaje(
-            "mensaje-cita",
-            "Selecciona la fecha y hora de inicio.",
-            "error"
-        );
-
-        return;
-    }
-
-
-    if (!fin) {
-
-        autocompletarFin();
-
-        fin =
-            finEl
-                ? finEl.value
-                : "";
-    }
-
-
-    if (!fin) {
-
-        mostrarMensaje(
-            "mensaje-cita",
-            "Selecciona la fecha y hora de finalización.",
-            "error"
-        );
-
-        return;
-    }
-
-
-    if (
-        new Date(fin).getTime() <=
-        new Date(inicio).getTime()
-    ) {
-
-        mostrarMensaje(
-            "mensaje-cita",
-            "La hora de fin debe ser posterior a la hora de inicio.",
-            "error"
-        );
-
-        return;
-    }
-
-
-    mostrarLoading(true);
-
-
-    var resultado =
-        await peticionBackend({
-
-            accion:
-                "crear_cita",
-
-            token:
-                tokenSesion,
-
-            cita: {
-
-                titulo:
-                    titulo,
-
-                inicio:
-                    inicio,
-
-                fin:
-                    fin,
-
-                descripcion:
-                    detalles
-            }
-        });
-
-
-    mostrarLoading(false);
-
-
-    if (
-        resultado &&
-        resultado.status ===
-            "success"
-    ) {
-
-        mostrarMensaje(
-            "mensaje-cita",
-            "✅ Cita agendada correctamente.",
-            "exito"
-        );
-
-
-        if (tituloEl)
-            tituloEl.value = "";
-
-
-        if (inicioEl)
-            inicioEl.value = "";
-
-
-        if (finEl)
-            finEl.value = "";
-
-
-        if (detallesEl)
-            detallesEl.value = "";
-
-
-        await cargarCitas();
-
-    } else {
-
-        if (
-            resultado &&
-            (
-                resultado.message || ""
-            )
-            .toLowerCase()
-            .includes("sesión")
-        ) {
-
-            alert(
-                resultado.message
-            );
-
-            cerrarSesion();
-
-            return;
-        }
-
-
-        mostrarMensaje(
-            "mensaje-cita",
-            "❌ " +
-                (
-                    resultado
-                        ? resultado.message
-                        : "No se pudo crear la cita."
-                ),
-            "error"
-        );
-    }
-}
-
-
-// ==========================================================
-// CARGAR CITAS
-// ==========================================================
-
-async function cargarCitas() {
-
-    if (!tokenSesion) {
-        return;
-    }
-
-
-    var lista =
-        document.getElementById(
-            "lista-citas"
-        );
-
-
-    if (lista) {
-
-        lista.innerHTML =
-            "<li>⏳ Cargando citas...</li>";
-    }
-
-
-    if (calendar) {
-
-        calendar.removeAllEvents();
-    }
-
-
-    var resultado =
-        await peticionBackend({
-
-            accion:
-                "obtener_citas",
-
-            token:
-                tokenSesion
-        });
-
-
-    if (
-        resultado &&
-        resultado.status ===
-            "error"
-    ) {
-
-        if (lista) {
-
-            lista.innerHTML = "";
-
-            var liError =
-                document.createElement(
-                    "li"
-                );
-
-            liError.textContent =
-                "❌ " +
-                resultado.message;
-
-            lista.appendChild(
-                liError
-            );
-        }
-
-
-        if (
-            (
-                resultado.message ||
-                ""
-            )
-            .toLowerCase()
-            .includes("sesión")
-        ) {
-
-            cerrarSesion();
-        }
-
-
-        return;
-    }
-
-
-    if (lista) {
-
-        lista.innerHTML =
-            "";
-    }
-
-
-    var usuariosVistos =
-        {};
-
-
-    var citas =
-        (
-            resultado &&
-            resultado.citas
-        )
-            ? resultado.citas
-            : [];
-
-
-    if (!citas.length) {
-
-        if (lista) {
-
-            var liVacio =
-                document.createElement(
-                    "li"
-                );
-
-            liVacio.textContent =
-                "📭 No hay citas agendadas actualmente.";
-
-            liVacio.style.color =
-                "var(--text-muted)";
-
-            lista.appendChild(
-                liVacio
-            );
-        }
-
-
-        if (miRol === "admin") {
-
-            actualizarLeyendaAdmin(
-                usuariosVistos
-            );
-        }
-
-
-        return;
-    }
-
-
-    citas.forEach(
-        function(cita) {
-
-
-            var usuarioNombre =
-                (
-                    cita.extendedProps &&
-                    cita.extendedProps.usuario
-                )
-                    ? cita.extendedProps.usuario
-                    : miNombreUsuario;
-
-
-            var descripcion =
-                (
-                    cita.extendedProps &&
-                    cita.extendedProps.descripcion
-                )
-                    ? cita.extendedProps.descripcion
-                    : "";
-
-
-            var color =
-                cita.backgroundColor ||
-                "#3498db";
-
-
-            usuariosVistos[
-                usuarioNombre
-            ] =
-                color;
-
-
-            // ------------------------------------------------
-            // CALENDARIO
-            // ------------------------------------------------
-
-            if (calendar) {
-
-                var tituloCalendario =
-                    miRol === "admin"
-                        ? usuarioNombre +
-                          ": " +
-                          cita.title
-                        : cita.title;
-
-
-                calendar.addEvent({
-
-                    id:
-                        cita.id,
-
-                    title:
-                        tituloCalendario,
-
-                    start:
-                        cita.start,
-
-                    end:
-                        cita.end ||
-                        undefined,
-
-                    backgroundColor:
-                        color,
-
-                    borderColor:
-                        color,
-
-                    textColor:
-                        "#ffffff",
-
-                    extendedProps: {
-
-                        usuario:
-                            usuarioNombre,
-
-                        descripcion:
-                            descripcion
-                    }
-                });
-            }
-
-
-            // ------------------------------------------------
-            // LISTA
-            // ------------------------------------------------
-
-            if (lista) {
-
-                var li =
-                    document.createElement(
-                        "li"
-                    );
-
-
-                li.style.borderLeft =
-                    "5px solid " +
-                    color;
-
-
-                // Usuario para admin.
-
-                if (
-                    miRol === "admin"
-                ) {
-
-                    var headerUser =
-                        document.createElement(
-                            "div"
-                        );
-
-                    headerUser.className =
-                        "cita-header-user";
-
-
-                    var tag =
-                        document.createElement(
-                            "span"
-                        );
-
-                    tag.className =
-                        "tag-usuario";
-
-                    tag.style.backgroundColor =
-                        color;
-
-                    tag.textContent =
-                        "👤 " +
-                        usuarioNombre;
-
-
-                    headerUser.appendChild(
-                        tag
-                    );
-
-                    li.appendChild(
-                        headerUser
-                    );
-                }
-
-
-                var titulo =
-                    document.createElement(
-                        "strong"
-                    );
-
-                titulo.textContent =
-                    cita.title;
-
-
-                var fecha =
-                    document.createElement(
-                        "span"
-                    );
-
-                fecha.className =
-                    "fecha-texto";
-
-                fecha.textContent =
-                    "⏰ " +
-                    formatearFecha(
-                        cita.start
-                    ) +
-                    (
-                        cita.end
-                            ? " → " +
-                              formatearFecha(
-                                  cita.end
-                              )
-                            : ""
-                    );
-
-
-                var detalles =
-                    document.createElement(
-                        "small"
-                    );
-
-                detalles.textContent =
-                    descripcion
-                        ? "📝 " +
-                          descripcion
-                        : "Sin detalles adicionales";
-
-
-                li.appendChild(
-                    titulo
-                );
-
-                li.appendChild(
-                    fecha
-                );
-
-                li.appendChild(
-                    detalles
-                );
-
-
-                // ------------------------------------------------
-                // BOTONES
-                //
-                // ADMIN:
-                // puede editar/eliminar todo.
-                //
-                // USER:
-                // solamente sus propias citas.
-                // ------------------------------------------------
-
-                var esPropietario =
-                    String(usuarioNombre)
-                        .trim() ===
-                    String(miNombreUsuario)
-                        .trim();
-
-
-                var puedeModificar =
-                    miRol === "admin" ||
-                    esPropietario;
-
-
-                if (
-                    puedeModificar
-                ) {
-
-                    var botones =
-                        document.createElement(
-                            "div"
-                        );
-
-                    botones.className =
-                        "fila-botones";
-
-
-                    var btnEditar =
-                        document.createElement(
-                            "button"
-                        );
-
-                    btnEditar.type =
-                        "button";
-
-                    btnEditar.textContent =
-                        "✏️ Editar";
-
-                    btnEditar.className =
-                        "btn-edit";
-
-
-                    btnEditar.onclick =
-                        function() {
-
-                            abrirModalEditar(
-                                cita
-                            );
-                        };
-
-
-                    var btnEliminar =
-                        document.createElement(
-                            "button"
-                        );
-
-                    btnEliminar.type =
-                        "button";
-
-                    btnEliminar.textContent =
-                        "🗑️ Eliminar";
-
-                    btnEliminar.className =
-                        "btn-delete";
-
-
-                    btnEliminar.onclick =
-                        function() {
-
-                            eliminarMiCita(
-                                cita.id
-                            );
-                        };
-
-
-                    botones.appendChild(
-                        btnEditar
-                    );
-
-                    botones.appendChild(
-                        btnEliminar
-                    );
-
-                    li.appendChild(
-                        botones
-                    );
-                }
-
-
-                lista.appendChild(
-                    li
-                );
-            }
-        }
-    );
-
-
-    if (miRol === "admin") {
-
-        actualizarLeyendaAdmin(
-            usuariosVistos
-        );
-    }
-}
-
-
-// ==========================================================
-// FORMATEAR FECHA
-// ==========================================================
-
-function formatearFecha(
-    valor
-) {
-
-    if (!valor) {
-        return "";
-    }
-
-
-    var texto =
-        String(valor);
-
-
-    texto =
-        texto.replace(
-            "T",
-            " "
-        );
-
-
-    return texto.substring(
-        0,
-        16
-    );
-}
-
-
-// ==========================================================
-// CONVERTIR FECHA A DATETIME LOCAL
-// ==========================================================
-
-function convertirParaInputDateTime(
-    valor
-) {
-
-    if (!valor) {
-        return "";
-    }
-
-
-    var texto =
-        String(valor);
-
-
-    texto =
-        texto.replace(
-            "Z",
-            ""
-        );
-
-
-    texto =
-        texto.replace(
-            " ",
-            "T"
-        );
-
-
-    // YYYY-MM-DDTHH:mm:ss
-    // input datetime-local necesita
-    // YYYY-MM-DDTHH:mm
-
-    return texto.substring(
-        0,
-        16
-    );
-}
-
-
-// ==========================================================
-// LEYENDA ADMIN
-// ==========================================================
-
-function actualizarLeyendaAdmin(
-    usuariosVistos
-) {
-
-    var contenedor =
-        document.getElementById(
-            "leyenda-usuarios"
-        );
-
-
-    if (!contenedor) {
-        return;
-    }
-
-
-    contenedor.innerHTML =
-        "";
-
-
-    var nombres =
-        Object.keys(
-            usuariosVistos
-        );
-
-
-    if (!nombres.length) {
-
-        var vacio =
-            document.createElement(
-                "span"
-            );
-
-        vacio.style.color =
-            "var(--text-muted)";
-
-        vacio.textContent =
-            "No hay usuarios con citas.";
-
-        contenedor.appendChild(
-            vacio
-        );
-
-        return;
-    }
-
-
-    nombres.forEach(
-        function(nombre) {
-
-            var color =
-                usuariosVistos[
-                    nombre
-                ];
-
-
-            var chip =
-                document.createElement(
-                    "span"
-                );
-
-
-            chip.className =
-                "leyenda-chip";
-
-
-            chip.style.backgroundColor =
-                color;
-
-
-            chip.textContent =
-                "👤 " +
-                nombre;
-
-
-            contenedor.appendChild(
-                chip
-            );
-        }
-    );
-}
-
-
-// ==========================================================
-// MOSTRAR DETALLES DEL EVENTO
-// ==========================================================
-
-function mostrarDetallesEvento(
-    evento
-) {
-
-    var usuario =
-        evento.extendedProps &&
-        evento.extendedProps.usuario
-            ? evento.extendedProps.usuario
-            : "";
-
-
-    var descripcion =
-        evento.extendedProps &&
-        evento.extendedProps.descripcion
-            ? evento.extendedProps.descripcion
-            : "Sin detalles";
-
-
-    var mensaje =
-        "📌 " +
-        evento.title +
-        "\n\n";
-
-
-    if (usuario) {
-
-        mensaje +=
-            "👤 Usuario: " +
-            usuario +
-            "\n";
-    }
-
-
-    mensaje +=
-        "⏰ Inicio: " +
-        formatearFecha(
-            evento.start
-        ) +
-        "\n";
-
-
-    if (evento.end) {
-
-        mensaje +=
-            "⏰ Fin: " +
-            formatearFecha(
-                evento.end
-            ) +
-            "\n";
-    }
-
-
-    mensaje +=
-        "\n📝 " +
-        descripcion;
-
-
-    alert(
-        mensaje
-    );
-}
-
-
-// ==========================================================
-// MODAL EDITAR
-// ==========================================================
-
-function abrirModalEditar(
-    cita
-) {
-
-    var modal =
-        document.getElementById(
-            "modal-editar"
-        );
-
-
-    if (!modal) {
-        return;
-    }
-
-
-    document.getElementById(
-        "editar-id"
-    ).value =
-        cita.id || "";
-
-
-    document.getElementById(
-        "editar-titulo"
-    ).value =
-        cita.title || "";
-
-
-    document.getElementById(
-        "editar-inicio"
-    ).value =
-        convertirParaInputDateTime(
-            cita.start
-        );
-
-
-    document.getElementById(
-        "editar-fin"
-    ).value =
-        convertirParaInputDateTime(
-            cita.end ||
-            cita.start
-        );
-
-
-    document.getElementById(
-        "editar-detalles"
-    ).value =
-        (
-            cita.extendedProps &&
-            cita.extendedProps.descripcion
-        )
-            ? cita.extendedProps.descripcion
-            : "";
-
-
-    ocultarMensaje(
-        "mensaje-editar"
-    );
-
-
-    modal.classList.remove(
-        "oculto"
-    );
-}
-
-
-// ==========================================================
-// CERRAR MODAL
-// ==========================================================
-
-function cerrarModalEditar() {
-
-    var modal =
-        document.getElementById(
-            "modal-editar"
-        );
-
-
-    if (modal) {
-
-        modal.classList.add(
-            "oculto"
-        );
-    }
-}
-
-
-// ==========================================================
-// GUARDAR EDICIÓN
-// ==========================================================
-
-async function guardarEdicionCita() {
-
-    var id =
-        document.getElementById(
-            "editar-id"
-        ).value;
-
-
-    var titulo =
-        document.getElementById(
-            "editar-titulo"
-        ).value.trim();
-
-
-    var inicio =
-        document.getElementById(
-            "editar-inicio"
-        ).value;
-
-
-    var fin =
-        document.getElementById(
-            "editar-fin"
-        ).value;
-
-
-    var descripcion =
-        document.getElementById(
-            "editar-detalles"
-        ).value.trim();
-
-
-    if (!titulo) {
-
-        mostrarMensaje(
-            "mensaje-editar",
-            "El título es obligatorio.",
-            "error"
-        );
-
-        return;
-    }
-
-
-    if (!inicio || !fin) {
-
-        mostrarMensaje(
-            "mensaje-editar",
-            "Inicio y fin son obligatorios.",
-            "error"
-        );
-
-        return;
-    }
-
-
-    if (
-        new Date(fin).getTime() <=
-        new Date(inicio).getTime()
-    ) {
-
-        mostrarMensaje(
-            "mensaje-editar",
-            "La hora de fin debe ser posterior a la hora de inicio.",
-            "error"
-        );
-
-        return;
-    }
-
-
-    mostrarLoading(true);
-
-
-    var resultado =
-        await peticionBackend({
-
-            accion:
-                "editar_cita",
-
-            token:
-                tokenSesion,
-
-            cita: {
-
-                id:
-                    id,
-
-                titulo:
-                    titulo,
-
-                inicio:
-                    inicio,
-
-                fin:
-                    fin,
-
-                descripcion:
-                    descripcion
-            }
-        });
-
-
-    mostrarLoading(false);
-
-
-    if (
-        resultado &&
-        resultado.status ===
-            "success"
-    ) {
-
-        cerrarModalEditar();
-
-        await cargarCitas();
-
-        mostrarMensaje(
-            "mensaje-cita",
-            "✅ Cita actualizada correctamente.",
-            "exito"
-        );
-
-    } else {
-
-        mostrarMensaje(
-
-            "mensaje-editar",
-
-            "❌ " +
-                (
-                    resultado
-                        ? resultado.message
-                        : "No se pudo actualizar la cita."
-                ),
-
-            "error"
-        );
-    }
-}
-
-
-// ==========================================================
-// ELIMINAR CITA
-// ==========================================================
-
-async function eliminarMiCita(
-    idCita
-) {
-
-    if (!idCita) {
-        return;
-    }
-
-
-    var confirmar =
-        confirm(
-            "¿Seguro que deseas eliminar esta cita?\n\nEsta acción no se puede deshacer."
-        );
-
-
-    if (!confirmar) {
-        return;
-    }
-
-
-    mostrarLoading(true);
-
-
-    var resultado =
-        await peticionBackend({
-
-            accion:
-                "eliminar_cita",
-
-            token:
-                tokenSesion,
-
-            id:
-                idCita
-        });
-
-
-    mostrarLoading(false);
-
-
-    if (
-        resultado &&
-        resultado.status ===
-            "success"
-    ) {
-
-        await cargarCitas();
-
-
-        mostrarMensaje(
-            "mensaje-cita",
-            "✅ Cita eliminada correctamente.",
-            "exito"
-        );
-
-    } else {
-
-        alert(
-            "❌ " +
-            (
-                resultado
-                    ? resultado.message
-                    : "No se pudo eliminar la cita."
-            )
-        );
-    }
-}
-
-
-// ==========================================================
-// CREAR USUARIO ADMIN
-// ==========================================================
-
-async function crearUsuarioPorAdmin() {
-
-    if (miRol !== "admin") {
-
-        alert(
-            "No tienes permisos de administrador."
-        );
-
-        return;
-    }
-
-
-    var usuarioEl =
-        document.getElementById(
-            "admin-usuario"
-        );
-
-
-    var nombreEl =
-        document.getElementById(
-            "admin-nombre"
-        );
-
-
-    var passwordEl =
-        document.getElementById(
-            "admin-contrasena"
-        );
-
-
-    var rolEl =
-        document.getElementById(
-            "admin-rol"
-        );
-
-
-    var usuario =
-        usuarioEl
-            ? usuarioEl.value.trim()
-            : "";
-
-
-    var nombre =
-        nombreEl
-            ? nombreEl.value.trim()
-            : "";
-
-
-    var password =
-        passwordEl
-            ? passwordEl.value
-            : "";
-
-
-    var rol =
-        rolEl
-            ? rolEl.value
-            : "user";
-
-
-    ocultarMensaje(
-        "mensaje-admin"
-    );
-
-
-    if (!usuario) {
-
-        mostrarMensaje(
-            "mensaje-admin",
-            "El usuario es obligatorio.",
-            "error"
-        );
-
-        return;
-    }
-
-
-    if (!nombre) {
-
-        mostrarMensaje(
-            "mensaje-admin",
-            "El nombre es obligatorio.",
-            "error"
-        );
-
-        return;
-    }
-
-
-    if (!password) {
-
-        mostrarMensaje(
-            "mensaje-admin",
-            "La contraseña es obligatoria.",
-            "error"
-        );
-
-        return;
-    }
-
-
-    if (
-        password.length < 4
-    ) {
-
-        mostrarMensaje(
-            "mensaje-admin",
-            "La contraseña debe tener al menos 4 caracteres.",
-            "error"
-        );
-
-        return;
-    }
-
-
-    mostrarLoading(true);
-
-
-    var resultado =
-        await peticionBackend({
-
-            accion:
-                "crear_usuario",
-
-            token:
-                tokenSesion,
-
-            nuevoUsuario: {
-
-                usuario:
-                    usuario,
-
-                nombre:
-                    nombre,
-
-                password:
-                    password,
-
-                rol:
-                    rol
-            }
-        });
-
-
-    mostrarLoading(false);
-
-
-    if (
-        resultado &&
-        resultado.status ===
-            "success"
-    ) {
-
-        mostrarMensaje(
-            "mensaje-admin",
-            "✅ Usuario '" +
-                usuario +
-                "' creado correctamente.",
-            "exito"
-        );
-
-
-        if (usuarioEl)
-            usuarioEl.value = "";
-
-
-        if (nombreEl)
-            nombreEl.value = "";
-
-
-        if (passwordEl)
-            passwordEl.value = "";
-
-
-        if (rolEl)
-            rolEl.value = "user";
-
-    } else {
-
-        mostrarMensaje(
-
-            "mensaje-admin",
-
-            "❌ " +
-                (
-                    resultado
-                        ? resultado.message
-                        : "No se pudo crear el usuario."
-                ),
-
-            "error"
-        );
-    }
-}
-
-
-// ==========================================================
-// CERRAR MODAL AL HACER CLICK FUERA
-// ==========================================================
-
-document.addEventListener(
-    "click",
-    function(event) {
-
-        var modal =
-            document.getElementById(
-                "modal-editar"
-            );
-
-
-        if (
-            modal &&
-            event.target === modal
-        ) {
-
-            cerrarModalEditar();
-        }
-    }
-);
-
-
-// ==========================================================
-// TECLA ESC
-// ==========================================================
-
-document.addEventListener(
-    "keydown",
-    function(event) {
-
-        if (
-            event.key ===
-            "Escape"
-        ) {
-
-            cerrarModalEditar();
-        }
-    }
-);
-
-
-// ==========================================================
-// EXPONER FUNCIONES
-// ==========================================================
-
-window.iniciarSesion =
-    iniciarSesion;
-
-window.cerrarSesion =
-    cerrarSesion;
-
-window.crearNuevaCita =
-    crearNuevaCita;
-
-window.cargarCitas =
-    cargarCitas;
-
-window.crearUsuarioPorAdmin =
-    crearUsuarioPorAdmin;
-
-window.abrirModalEditar =
-    abrirModalEditar;
-
-window.cerrarModalEditar =
-    cerrarModalEditar;
-
-window.guardarEdicionCita =
-    guardarEdicionCita;
-
-window.eliminarMiCita =
-    eliminarMiCita;
-
-window.autocompletarFin =
-    autocompletarFin;
-
-window.probarConexion =
-    probarConexion;
-
+/* ==========================================================
+   INICIO
+   ========================================================== */
+
+window.iniciarSesion=iniciarSesion;
+window.cerrarSesion=cerrarSesion;
+window.crearNuevaCita=crearNuevaCita;
+window.cargarCitas=cargarCitas;
+window.crearUsuarioPorAdmin=crearUsuarioPorAdmin;
+window.cargarUsuarios=cargarUsuarios;
+window.cargarBitacora=cargarBitacora;
+window.cambiarMiPassword=cambiarMiPassword;
+window.editarMiCita=abrirEditarCita;
+window.eliminarMiCita=eliminarMiCita;
+window.autocompletarFin=autocompletarFin;
+window.probarConexion=probarConexion;
+
+document.addEventListener("DOMContentLoaded", function(){
+  restaurarSesion();
+});
 
 </script>
-
 </body>
-
 </html>
